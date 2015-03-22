@@ -13,6 +13,26 @@
 import numpy as np
 
 def make_t_matrix(toption,**kwargs):
+    """Set up the observation matrix either using a series of simulated gaussians or a dataset specified by a keyword argument.
+    
+    Parameters
+    ----------
+    toption: str
+        Option that says whether this is a simulated ('simulation') observation (a series of gaussians) or an observation to be pulled from a file ('data')
+    **kwargs
+        nx: int
+            number of columns for the simulated data set
+        ny: int
+            number of rows for the simulated data set
+        p: int
+            number of sources in the simulated data set
+        
+    Returns
+    -------
+    T: numpy two-dimensional array
+        Matrix that represents the observation we want to factorize
+    
+    """
     #Check which option to use
     if "simulation" == toption:
         #Parse arguments for simulation
@@ -136,9 +156,10 @@ def minimize_div(u,v,T,A,max_i,div_limit):
         if i > 0:
             delta_div = np.fabs(d-div[i-1])
             
-        #Print progress
-        print "i = ",i
-        print "div = ",d
+        #Print progress (skip for initialization runs)
+        if max_i > 20:
+            print "i = ",i
+            print "div = ",d
         
         #Increment the counter 
         i = i+1
