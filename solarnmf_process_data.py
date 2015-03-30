@@ -7,6 +7,23 @@
 import numpy as np
 
 def smooth_1d_fft(t,x,freq_thresh):
+    """Smoothing algorithm that uses FFT to filter out frequencies greater than freq_thresh
+    
+    Parameters
+    ----------
+    t: 1darray
+        one-dimensional time array
+    x: 1darray
+        one-dimensional time series that will be smoothed
+    freq_thresh: float
+        frequency above which oscillations in x will be zeroed
+        
+    Returns
+    -------
+    x_ifft.real: 1darray
+        one-dimensional filtered time series x
+        
+    """
     
     #Perform FFT on timeseries data
     x_fft = np.fft.fft(x)
@@ -75,5 +92,29 @@ def smooth_1d_window(x,**kwargs):
     
     #Return the smoothed vector
     return y
+    
+def ts2mat(x,sigma):
+    """Convert time series to matrix with some spread defined by a gaussian with standard deviation sigma.
+    
+    Parameters
+    ----------
+    
+    Returns
+    -------
+    
+    """
+    
+    #Preallocate space for filter and square matrix to hold time series vector
+    xmat = np.zeros([len(x),len(x)])
+    xfilt = np.zeros([len(x),len(x)])
+        
+    #Build a square matrix out of time series vector and set up the filter matrix
+    for i in range(len(x)):
+        xmat[:,i] = x
+        xfilt[:,i] = np.exp(-np.linspace(-1,1,len(x))**2/(2*sigma**2))
+        
+    #Return the filtered matrix
+    return np.transpose(np.dot(xmat,np.transpose(xfilt)))
+    
     
     
