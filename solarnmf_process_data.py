@@ -5,6 +5,7 @@
 
 #Import necessary modules
 import numpy as np
+from scipy.ndimage.interpolation import rotate
 
 def smooth_1d_fft(t,x,freq_thresh):
     """Smoothing algorithm that uses FFT to filter out frequencies greater than freq_thresh
@@ -115,3 +116,19 @@ def ts2mat(x,dim2,sigma):
 
     #Return the filtered matrix
     return np.transpose(np.dot(x_mat,np.transpose(xfilt_mat)))
+
+
+def crop_and_rotate(x,angle):
+    
+    #Find the backgound value
+    bg_val = np.min(x[np.where(x>np.max(x)/100.0)])
+    
+    #Rotate the image
+    x_rot = rotate(x,angle)
+    
+    
+    
+    
+    
+    
+    
