@@ -61,13 +61,13 @@ def make_t_matrix(toption,**kwargs):
             x = x/np.max(x)
         
             #Apply the smoothing function
-            x_smooth = spd.smooth_1d_window(x,window_length=21,window='hanning')
+            x_smooth = spd.smooth_1d_window(x,window_length=11,window='hanning')
         
             #Make a matrix representation of the time series
             x_mat = spd.ts2mat(x_smooth,len(x_smooth),0.1)
     
             #Rotate the important data along the diagonal
-            x_mat_rot = spd.crop_and_rotate(x_mat,45)
+            x_mat_rot = spd.crop_and_rotate(x_mat,kwargs['angle'])
         
             #Return the rotated matrix and the original vector
             return {'T':x_mat_rot,'x':x,'target':sim_result['target']}
@@ -86,13 +86,13 @@ def make_t_matrix(toption,**kwargs):
         x = x/np.max(x)
         
         #Apply the smoothing function
-        x_smooth = spd.smooth_1d_window(x,window_length=21,window='hanning')
+        x_smooth = spd.smooth_1d_window(x,window_length=11,window='hanning')
         
         #Make a matrix representation of the time series
         x_mat = spd.ts2mat(x_smooth,len(x_smooth),0.1)
     
         #Rotate the important data along the diagonal
-        x_mat_rot = spd.crop_and_rotate(x_mat,45)
+        x_mat_rot = spd.crop_and_rotate(x_mat,kwargs['angle'])
         
         #Return the rotated matrix and the original vector
         return {'T':x_mat_rot,'x':x}

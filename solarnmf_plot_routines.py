@@ -26,7 +26,7 @@ def plot_mat_obsVpred(T,A,**kwargs):
         
 def plot_ts_obsVpred(x,A,**kwargs):
     #Get x reconstruction from A
-    A_rot_back  = spd.crop_and_rotate(A,-45)
+    A_rot_back  = spd.crop_and_rotate(A,kwargs['angle'])
     row,col = A_rot_back.shape
     xA = A_rot_back[int(ceil(row/2)),:]
     
@@ -77,7 +77,7 @@ def plot_mat_targVpred(P,Q,u,v,target,**kwargs):
         
 def plot_ts_reconstruction(x,u,v,**kwargs):
     #Calculate the reconstruction
-    x_rec = spd.reconstruct_ts_from_uv(u,v)
+    x_rec = spd.reconstruct_ts_from_uv(u,v,kwargs['angle'])
     
     #Set up the figure
     fig = plt.figure()

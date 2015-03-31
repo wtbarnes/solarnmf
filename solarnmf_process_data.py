@@ -136,7 +136,7 @@ def crop_and_rotate(x_mat,angle):
     #Return trimmed matrix
     return x_rot[top:bottom,left:right]
     
-def reconstruct_ts_from_uv(u,v):
+def reconstruct_ts_from_uv(u,v,angle):
     #Get the number of sources
     rows,k = u.shape
     
@@ -146,9 +146,9 @@ def reconstruct_ts_from_uv(u,v):
     #Matrix multiply u and v for each source
     for i in range(k):
         #Find the source matrix
-        temp = np.outer(u[:,i],v[i,:])
+        temp = np.dot(u[:,i],v[i,:])
         #Rotate back
-        temp = crop_and_rotate(temp,-45)
+        temp = crop_and_rotate(temp,angle)
         #Cut along center to get vector
         r,c = temp.shape
         temp = temp[int(r/2),:]
