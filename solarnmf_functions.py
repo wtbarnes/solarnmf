@@ -36,6 +36,7 @@ def make_t_matrix(toption,**kwargs):
     """
     #Check which option to use
     if "simulation" == toption:
+        
         #Parse arguments for simulation
         for key in kwargs:
             if key == "nx":
@@ -44,12 +45,32 @@ def make_t_matrix(toption,**kwargs):
                 ny = int(kwargs[key])
             elif key == "p":
                 p = int(kwargs[key])
-                
+            
         #Call function to make simulated results
-        sim_result = make_gaussians(nx,ny,p)
+        sim_result = make_gaussians(nx,ny,p,format=kwargs['format'])
         
-        #Return values 
-        return {'target':sim_result['target'],'T':sim_result['T']}
+        #If we are using Gauusian matrices, return the matrices
+        if kwargs['format'] == 'matrix':
+            #Return values 
+            return {'target':sim_result['target'],'T':sim_result['T']}
+        else:
+            #Format vector as matrix
+            x = sim_result['x']
+            
+            #Make sure data is normalized
+            x = x/np.max(x)
+        
+            #Apply the smoothing function
+            x_smooth = spd.smooth_1d_window(x,window_length=21,window='hanning')
+        
+            #Make a matrix representation of the time series
+            x_mat = spd.ts2mat(x_smooth,len(x_smooth),0.1)
+    
+            #Rotate the important data along the diagonal
+            x_mat_rot = spd.crop_and_rotate(x_mat,45)
+        
+            #Return the rotated matrix and the original vector
+            return {'T':x_mat_rot,'x':x,'target':sim_result['target']}
         
     if "data" == toption:
         for key in kwargs:
@@ -77,36 +98,61 @@ def make_t_matrix(toption,**kwargs):
         return {'T':x_mat_rot,'x':x}
 
 
-def make_gaussians(nx,ny,p):
+def make_gaussians(nx,ny,p,**kwargs):
     
-    #Calculate standard deviations in x and y
-    sigma_x = 0.15*np.ones((1,p))
-    sigma_y = 0.15*np.ones((1,p))
+    #Check the format
+    if kwargs['format'] == 'matrix':
+        #Calculate standard deviations in x and y
+        sigma_x = 0.15*np.ones((1,p))
+        sigma_y = 0.15*np.ones((1,p))
     
-    #Generate random center positions for pulses (normalized to [0,1])
-    centers = np.random.rand(p,2)
+        #Generate random center positions for pulses (normalized to [0,1])
+        centers = np.random.rand(p,2)
     
-    #Preallocate for composite and individual pulses
-    T = np.zeros((ny,nx))
-    target = np.zeros((ny,nx,p))
+        #Preallocate for composite and individual pulses
+        T = np.zeros((ny,nx))
+        target = np.zeros((ny,nx,p))
     
-    #Set up the X and Y meshes
-    X,Y = np.meshgrid(np.linspace(0,1,nx),np.linspace(0,1,ny))
+        #Set up the X and Y meshes
+        X,Y = np.meshgrid(np.linspace(0,1,nx),np.linspace(0,1,ny))
     
-    #Calculate the Gaussian pulses and add them to the T matrix
-    for i in range(p):
-        #Calculate Gaussian pulse
-        z = np.exp(-1/(2*(sigma_x[0,i])**2)*((X - centers[i,0])**2) - 1/(2*(sigma_y[0,i])**2)*((Y - centers[i,1])**2))
-        #Add to total T matrix
-        T = T + z
-        #Save the events that make up the T matrix
-        target[:,:,i] = z
+        #Calculate the Gaussian pulses and add them to the T matrix
+        for i in range(p):
+            #Calculate Gaussian pulse
+            z = np.exp(-1/(2*(sigma_x[0,i])**2)*((X - centers[i,0])**2) - 1/(2*(sigma_y[0,i])**2)*((Y - centers[i,1])**2))
+            #Add to total T matrix
+            T = T + z
+            #Save the events that make up the T matrix
+            target[:,:,i] = z
         
-    #Normalize the T matrix to one
-    T = T/np.max(T)
+        #Normalize the T matrix to one
+        T = T/np.max(T)
     
-    #Return the X,Y,T and target matrices
-    return {'target':target, 'T':T}
+        #Return the X,Y,T and target matrices
+        return {'target':target, 'T':T}
+    else:
+        #Create list for simulated gaussians
+        target = []
+        #Initialize total
+        x = 0.0
+        #Simulate 1D timeseries
+        #Create series of Gaussians
+        t = np.linspace(-1,1,nx)
+        for i in range(p):
+            #Get random sign
+            if np.random.rand() > 0.5:
+                mu_sign = -1.0
+            else:
+                mu_sign = 1.0
+            #Create the Gaussian
+            temp = np.random.rand()*np.exp(-(t+mu_sign*np.random.rand())**2/(2.0*0.1**2))
+            #Add to total
+            x = x + temp
+            #Save the components
+            target.append(temp)
+            
+        #Return the timeseries
+        return {'target':target,'x':x}
     
 
 def initialize_uva(nx,ny,q,r,r_iter,T):
