@@ -17,7 +17,7 @@ nx,ny = 100,100 #dimensions for simulation
 results = snf.make_t_matrix("simulation",format="timeseries",nx=nx,ny=ny,p=P,angle=angle,filename='/home/wtb2/Desktop/gaussian_test.dat')
 
 #Get the dimensions of the T matrix
-#ny,nx = results['T'].shape
+ny,nx = results['T'].shape
 
 #Initialize the U, V, and A matrices
 uva_initial = snf.initialize_uva(nx,ny,Q,10,10,results['T'])
