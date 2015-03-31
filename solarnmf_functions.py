@@ -11,6 +11,7 @@
 
 #Import necessary modules
 import numpy as np
+import solarnmf_process_data as spd
 
 def make_t_matrix(toption,**kwargs):
     """Set up the observation matrix either using a series of simulated gaussians or a dataset specified by a keyword argument.
@@ -48,7 +49,7 @@ def make_t_matrix(toption,**kwargs):
         sim_result = make_gaussians(nx,ny,p)
         
         #Return values 
-        return {'X':sim_result['X'],'Y':sim_result['Y'],'target':sim_result['target'],'T':sim_result['T']}
+        return {'target':sim_result['target'],'T':sim_result['T']}
         
     if "data" == toption:
         for key in kwargs:
@@ -57,11 +58,23 @@ def make_t_matrix(toption,**kwargs):
             elif key == "file_format":
                 file_format = kwargs[key]
         
-        #DEBUG
-        print "Input filename is ",filename
-        print "Filename option not yet implemented"
+        #Load the specified file
+        x = np.loadtxt(filename)
+        
+        #Make sure data is normalized
+        x = x/np.max(x)
+        
+        #Apply the smoothing function
+        x_smooth = spd.smooth_1d_window(x,window_length=21,window='hanning')
+        
+        #Make a matrix representation of the time series
+        x_mat = spd.ts2mat(x_smooth,len(x_smooth),0.2)
     
-    
+        #Rotate the important data along the diagonal
+        x_mat_rot = spd.crop_and_rotate(x_mat,45)
+        
+        #Return the rotated matrix and the original vector
+        return {'x_mat_rot':x_mat_rot,'x':x}
 
 
 def make_gaussians(nx,ny,p):
@@ -93,7 +106,7 @@ def make_gaussians(nx,ny,p):
     T = T/np.max(T)
     
     #Return the X,Y,T and target matrices
-    return {'X':X, 'Y':Y, 'target':target, 'T':T}
+    return {'target':target, 'T':T}
     
 
 def initialize_uv(nx,ny,q,r,r_iter,T):
