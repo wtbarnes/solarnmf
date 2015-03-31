@@ -8,7 +8,7 @@ import solarnmf_functions as snf
 import solarnmf_plot_routines as spr
 
 #Read in and format the time series
-results = snf.make_t_matrix("simulation",format="timeseries",filename='/home/wtb2/Desktop/gaussian_test.dat')
+results = snf.make_t_matrix("simulation",format="timeseries",nx=100,ny=100,p=10,filename='/home/wtb2/Desktop/gaussian_test.dat')
 
 #Get the dimensions of the T matrix
 ny,nx = results['T'].shape
@@ -17,10 +17,10 @@ ny,nx = results['T'].shape
 Q = 10
 
 #Initialize the U, V, and A matrices
-uva_initial = snf.initialize_uva(nx,ny,Q,5,5,results['T'])
+uva_initial = snf.initialize_uva(nx,ny,Q,5,10,results['T'])
 
 #Start the minimizer
-min_results = snf.minimize_div(uva_initial['u'],uva_initial['v'],results['T'],uva_initial['A'],200,1.0e-5)
+min_results = snf.minimize_div(uva_initial['u'],uva_initial['v'],results['T'],uva_initial['A'],100,1.0e-5)
 
 #Show the initial and final matrices side-by-side
 spr.plot_mat_obsVpred(results['T'],min_results['A'])
