@@ -124,7 +124,7 @@ def crop_and_rotate(x_mat,angle):
     bg_val = np.min(x_mat[np.where(x_mat>np.max(x_mat)/100.0)])
     
     #Rotate the image and interpolate as necessary
-    x_rot = rotate(x,angle)
+    x_rot = rotate(x_mat,angle)
     
     #Find rows and columns of rotated matrix
     #r_tot,c_tot = x_mat.shape
