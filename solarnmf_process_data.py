@@ -103,15 +103,15 @@ def ts2mat(x,dim2,sigma):
     -------
 
     """
+    #Set up Gaussian to filter results through
+    t = np.linspace(-1,1,dim2)
+    xfilt = np.exp(-t**2/(2*sigma**2))
 
-    #Preallocate space for filter and square matrix to hold time series vector
-    xmat = np.zeros([len(x),dim2])
-    xfilt = np.zeros([len(x),dim2])
-
-    #Build a square matrix out of time series vector and set up the filter matrix
-    for i in range(dim2):
-        xmat[:,i] = x
-        xfilt[:,i] = np.exp(-np.linspace(-1,1,len(x))**2/(2*sigma**2))
+    #Mimic matrix multiplication
+    xfilt_mat = np.zeros([dim2,1])
+    x_mat = np.zeros([len(x),1])
+    xfilt_mat[:,0] = xfilt
+    x_mat[:,0] = x
 
     #Return the filtered matrix
-    return np.transpose(np.dot(xmat,np.transpose(xfilt)))
+    return np.transpose(np.dot(x_mat,np.transpose(xfilt_mat)))
