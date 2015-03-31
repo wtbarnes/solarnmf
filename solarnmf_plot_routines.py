@@ -26,7 +26,7 @@ def plot_mat_obsVpred(T,A,**kwargs):
         
 def plot_ts_obsVpred(x,A,**kwargs):
     #Get x reconstruction from A
-    A_rot_back  = spd.crop_and_rotate(x,-45)
+    A_rot_back  = spd.crop_and_rotate(A,-45)
     row,col = A_rot_back.shape
     xA = A_rot_back[int(row/2),:]
     

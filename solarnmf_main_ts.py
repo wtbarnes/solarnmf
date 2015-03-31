@@ -20,7 +20,7 @@ Q = 10
 uva_initial = snf.initialize_uva(nx,ny,Q,5,10,results['T'])
 
 #Start the minimizer
-min_results = snf.minimize_div(uva_initial['u'],uva_initial['v'],results['T'],uva_initial['A'],100,1.0e-5)
+min_results = snf.minimize_div(uva_initial['u'],uva_initial['v'],results['T'],uva_initial['A'],200,1.0e-5)
 
 #Show the initial and final matrices side-by-side
 spr.plot_mat_obsVpred(results['T'],min_results['A'])
