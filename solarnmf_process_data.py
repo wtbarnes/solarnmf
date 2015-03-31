@@ -118,14 +118,32 @@ def ts2mat(x,dim2,sigma):
     return np.transpose(np.dot(x_mat,np.transpose(xfilt_mat)))
 
 
-def crop_and_rotate(x,angle):
+def crop_and_rotate(x_mat,angle):
     
     #Find the backgound value
-    bg_val = np.min(x[np.where(x>np.max(x)/100.0)])
+    bg_val = np.min(x_mat[np.where(x_mat>np.max(x_mat)/100.0)])
     
-    #Rotate the image
+    #Rotate the image and interpolate as necessary
     x_rot = rotate(x,angle)
     
+    #Find rows and columns of rotated matrix
+    #r_tot,c_tot = x_mat.shape
+    
+    #Set found flags to false for all corners
+    #left_flag,right_flag,top_flag,bottom_flag = False,False,False,False
+    
+    #Set bounds as default values
+    #left_bound,right_bound,top_bound,bottom_bound = 0,c_tot-1,0,r_tot-1
+    
+    #Find bounds using numpy.where function
+    row_bounds,col_bounds = np.where(x_rot>bg_val)
+    top = np.min(row_bounds)
+    bottom = np.max(row_bounds)
+    left = np.min(col_bounds)
+    right = np.max(col_bounds)
+    
+    #Return trimmed matrix
+    return x_rot[top:bottom,left:right]
     
     
     
