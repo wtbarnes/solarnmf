@@ -4,7 +4,7 @@
 #31 March 2015
 
 #Import needed modules
-import solarnmf_functs as snf
+import solarnmf_functions as snf
 import solarnmf_plot_routines as spr
 
 #Read in and format the time series
