@@ -24,13 +24,10 @@ Q = 3
 results = snf.make_t_matrix("simulation",nx=NX,ny=NY,p=P)
 
 #Initialize the U and V matrices
-uv_initial = snf.initialize_uv(NX,NY,Q,10,10,results['T'])
-
-#Calculate the initial A matrix
-a_initial = np.dot(uv_initial['u'],uv_initial['v'])
+uva_initial = snf.initialize_uva(NX,NY,Q,10,10,results['T'])
 
 #Start the minimizer
-min_results = snf.minimize_div(uv_initial['u'],uv_initial['v'],results['T'],a_initial,500,1.0e-5)
+min_results = snf.minimize_div(uva_initial['u'],uva_initial['v'],results['T'],uva_initial['A'],500,1.0e-5)
 
 #Plot the total results for the observation and the prediction
 spr.plot_obsVpred(results['T'],min_results['A'])

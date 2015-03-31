@@ -68,13 +68,13 @@ def make_t_matrix(toption,**kwargs):
         x_smooth = spd.smooth_1d_window(x,window_length=21,window='hanning')
         
         #Make a matrix representation of the time series
-        x_mat = spd.ts2mat(x_smooth,len(x_smooth),0.2)
+        x_mat = spd.ts2mat(x_smooth,len(x_smooth),0.1)
     
         #Rotate the important data along the diagonal
         x_mat_rot = spd.crop_and_rotate(x_mat,45)
         
         #Return the rotated matrix and the original vector
-        return {'x_mat_rot':x_mat_rot,'x':x}
+        return {'T':x_mat_rot,'x':x}
 
 
 def make_gaussians(nx,ny,p):
@@ -109,7 +109,7 @@ def make_gaussians(nx,ny,p):
     return {'target':target, 'T':T}
     
 
-def initialize_uv(nx,ny,q,r,r_iter,T):
+def initialize_uva(nx,ny,q,r,r_iter,T):
     
     #Initialize U and V matrices
     utemp = np.random.rand(ny,q)
@@ -123,6 +123,8 @@ def initialize_uv(nx,ny,q,r,r_iter,T):
     
     #Begin loop to check divergence criteria
     for i in range(r):
+        #Print some output
+        print "Starting initialization iteration ",i
         #Call the minimizer
         temp = minimize_div(utemp,vtemp,T,atemp,r_iter,div_limit)
         #Get the last value of the divergence measure
@@ -140,8 +142,11 @@ def initialize_uv(nx,ny,q,r,r_iter,T):
         vtemp = np.random.rand(q,nx)
         atemp = np.dot(utemp,vtemp)
         
+    #Create the initial a matrix from the initial u and v matrices
+    A = np.dot(u,v)
+        
     #Return u and v values with lowest final div value
-    return {'u':u, 'v':v}
+    return {'u':u, 'v':v, 'A':A}
         
         
     
