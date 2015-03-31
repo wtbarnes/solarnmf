@@ -28,7 +28,7 @@ def plot_ts_obsVpred(x,A,**kwargs):
     #Get x reconstruction from A
     A_rot_back  = spd.crop_and_rotate(A,kwargs['angle'])
     row,col = A_rot_back.shape
-    xA = A_rot_back[int(ceil(row/2)),:]
+    xA = A_rot_back[int(np.ceil(row/2)),:]
     
     #Create the figure
     fig = plt.figure()
