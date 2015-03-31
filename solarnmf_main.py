@@ -14,8 +14,6 @@
 import solarnmf_functions as snf
 import solarnmf_plot_routines as spr
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 NX = 100
 NY = 100

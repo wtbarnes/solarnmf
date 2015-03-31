@@ -6,8 +6,10 @@
 #Import necessary modules
 import numpy as np
 import matplotlib.pyplot as plt
+import solarnmf_process_data as spd
 
-def plot_obsVpred(T,A,**kwargs):
+
+def plot_mat_obsVpred(T,A,**kwargs):
     #Plot the total results for the observation and the prediction
     fig, axes = plt.subplots(1,2)
     axes[0].matshow(T,cmap='hot')
@@ -20,9 +22,35 @@ def plot_obsVpred(T,A,**kwargs):
         plt.savefig(kwargs['print_fig_filename'],format='eps',dpi=1000)
     else:
         plt.show()
+        
+        
+def plot_ts_obsVpred(x,A,**kwargs):
+    #Get x reconstruction from A
+    A_rot_back  = spd.crop_and_rotate(x,-45)
+    row,col = A_rot_back.shape
+    xA = A_rot_back[int(row/2),:]
+    
+    #Create the figure
+    fig = plt.figure()
+    #Set up the axis
+    ax = fig.gca()
+    #Plot the original vector
+    ax.plot(x,'k.',label='Observation')
+    #Plot the reconstruction
+    ax.plot(xA,'r',label='NMF')
+    #Set some labels and titles
+    ax.set_title(r'NMF Time Series Reconstruction',fontsize=18)
+    ax.set_ylabel(r'Intensity (arb. units)',fontsize=18)
+    ax.set_xlabel(r'$t$ (arb. units)',fontsize=18)
+    
+    #Check if output filename is specified
+    if 'print_fig_filename' in kwargs:
+        plt.savefig(kwargs['print_fig_filename'],format='eps',dpi=1000)
+    else:
+        plt.show()
 
 
-def plot_sim_targVpred(P,Q,u,v,target,**kwargs):
+def plot_mat_targVpred(P,Q,u,v,target,**kwargs):
     #Make the reconstructed events
     #Set the number of columns for the plots
     if P > Q:
@@ -45,6 +73,34 @@ def plot_sim_targVpred(P,Q,u,v,target,**kwargs):
         plt.savefig(kwargs['print_fig_filename'],format='eps',dpi=1000)
     else:
         plt.show()
+        
+        
+def plot_ts_reconstruction(x,u,v,**kwargs):
+    #Calculate the reconstruction
+    x_rec = spd.reconstruct_ts_from_uv(u,v)
+    
+    #Set up the figure
+    fig = plt.figure()
+    #Set up the axis
+    ax = fig.gca()
+    
+    #Plot the original x vector
+    ax.plot(x,'k')
+    #Plot all of the event reconstructions
+    for y in x_rec:
+        ax.plot(y,c=np.random.rand(3,1))
+        
+    #Set some labels and titles
+    ax.set_title(r'Reconstructed Events',fontsize=18)
+    ax.set_ylabel(r'Intensity (arb. units)',fontsize=18)
+    ax.set_xlabel(r'$t$ (arb. units)',fontsize=18)
+    
+    #Check if output filename is specified
+    if 'print_fig_filename' in kwargs:
+        plt.savefig(kwargs['print_fig_filename'],format='eps',dpi=1000)
+    else:
+        plt.show()
+
 
 def plot_convergence(div,**kwargs):
     #Set up figure
