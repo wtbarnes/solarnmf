@@ -146,7 +146,7 @@ def reconstruct_ts_from_uv(u,v,angle):
     #Matrix multiply u and v for each source
     for i in range(k):
         #Find the source matrix
-        temp = np.dot(u[:,i],v[i,:])
+        temp = np.outer(u[:,i],v[i,:])
         #Rotate back
         temp = crop_and_rotate(temp,angle)
         #Cut along center to get vector
