@@ -7,7 +7,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_obsVpred(T,A):
+def plot_obsVpred(T,A,**kwargs):
     #Plot the total results for the observation and the prediction
     fig, axes = plt.subplots(1,2)
     axes[0].matshow(T,cmap='hot')
