@@ -14,7 +14,7 @@ angle = 45 #rotation angle
 nx,ny = 100,100 #dimensions for simulation
 
 #Read in and format the time series
-results = snf.make_t_matrix("simulation",format="timeseries",nx=nx,ny=ny,p=P,angle=anglefilename='/home/wtb2/Desktop/gaussian_test.dat')
+results = snf.make_t_matrix("simulation",format="timeseries",nx=nx,ny=ny,p=P,angle=angle,filename='/home/wtb2/Desktop/gaussian_test.dat')
 
 #Get the dimensions of the T matrix
 #ny,nx = results['T'].shape
