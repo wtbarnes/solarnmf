@@ -8,13 +8,13 @@ import solarnmf_functions as snf
 import solarnmf_plot_routines as spr
 
 #Set some initial parameters
-P = 10 #simulated number of sources
-Q = 10 #guessed number of sources
-angle = 45 #rotation angle
+P = 15 #simulated number of sources
+Q = 15 #guessed number of sources
+angle = 0 #rotation angle
 nx,ny = 100,100 #dimensions for simulation
 
 #Read in and format the time series
-results = snf.make_t_matrix("simulation",format="timeseries",nx=nx,ny=ny,p=P,angle=angle,filename='/home/wtb2/Desktop/gaussian_test.dat')
+results = snf.make_t_matrix("simulation",format="timeseries",nx=nx,ny=ny,p=P,angle=angle,filename='/data/datadrive2/AIA_fm_spectra/fp_timeseries/frames(AIA_94).2D_timeseries')
 
 #Get the dimensions of the T matrix
 ny,nx = results['T'].shape
