@@ -214,7 +214,6 @@ def minimize_div(u,v,T,A,max_i,div_limit):
     #Calculate error matrix
     error = calc_error(T,u,v)
     
-    
     #Begin loop to minimize divergence metric
     while i < max_i and delta_div > div_limit:
         
