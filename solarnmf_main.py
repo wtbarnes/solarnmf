@@ -21,7 +21,7 @@ P = 4
 Q = 3
 
 #Simulate some data
-results = snf.make_t_matrix("simulation",nx=NX,ny=NY,p=P)
+results = snf.make_t_matrix("simulation",nx=NX,ny=NY,p=P,format='matrix')
 
 #Initialize the U and V matrices
 uva_initial = snf.initialize_uva(NX,NY,Q,10,10,results['T'])
@@ -30,10 +30,10 @@ uva_initial = snf.initialize_uva(NX,NY,Q,10,10,results['T'])
 min_results = snf.minimize_div(uva_initial['u'],uva_initial['v'],results['T'],uva_initial['A'],500,1.0e-5)
 
 #Plot the total results for the observation and the prediction
-spr.plot_obsVpred(results['T'],min_results['A'])
+spr.plot_mat_obsVpred(results['T'],min_results['A'])
 
 #Plot the reconstructed events
-spr.plot_sim_targVpred(P,Q,min_results['u'],min_results['v'],results['target'])
+spr.plot_mat_targVpred(P,Q,min_results['u'],min_results['v'],results['target'])
     
 #Plot the convergence
 spr.plot_convergence(min_results['div'])
