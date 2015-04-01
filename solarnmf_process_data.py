@@ -1,3 +1,4 @@
+<<<<<<< Local Changes
 #solarnmf_process_data.py
 
 #Will Barnes
@@ -158,9 +159,13 @@ def reconstruct_ts_from_uv(u,v,angle):
     #Return list of reconstructed x vectors
     return x_rec
         
+<<<<<<< Local Changes
+    =======
+>>>>>>> External Changes
+=======
     
     
     
     
     
-    
+    >>>>>>> External Changes

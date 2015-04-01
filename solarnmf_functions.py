@@ -198,6 +198,9 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
     
 def minimize_div(u,v,T,A,max_i,div_limit):
     
+    #Set epsilon parameter to make sure everything is non-negative
+    eps = 1.0e-6
+    
     #Initialize vector for divergence metric
     div = np.zeros(max_i)
     
@@ -205,12 +208,18 @@ def minimize_div(u,v,T,A,max_i,div_limit):
     i = 0
     delta_div = div_limit + 1
     
+    #Normalize the columns of u
+    u = normalize_ucols(u)
+    
+    #Calculate error matrix
+    error = calc_error(T,u,v)
+    
+    
     #Begin loop to minimize divergence metric
     while i < max_i and delta_div > div_limit:
         
         #Update the U,V, and A matrices
-        updates = update_uva(u,v,T,A,i)
-        u,v,A = updates['u'],updates['v'],updates['A']
+        u,v,A = update_uva(u,v,T,A,error,eps)
         
         #Calculate divergence metric
         d = calculate_div(T,A)
@@ -232,26 +241,38 @@ def minimize_div(u,v,T,A,max_i,div_limit):
     div = div[0:i]
         
     #Save the results
-    return {'u':u, 'v':v, 'A':A, 'div':div}
+    return u,v,A,div
     
     
-def update_uva(u,v,T,A,i):
+def update_uva(u,v,T,A,error,eps):
     
-    #Impose order of update rules (following JDB)
-    #Alternating u,v, and A with alternating order
-    if i % 2 == 0:
-        u = update_u(u,v,T,A)
-        A = np.dot(u,v)
-        v = update_v(u,v,T,A)
-        A = np.dot(u,v)
-    else:
-        v = update_v(u,v,T,A)
-        A = np.dot(u,v)
-        u = update_u(u,v,T,A)
-        A = np.dot(u,v)
+    #Use Regularized HALS algorithm (see Ch. 4 of Cichoki et al.(2009))
+    
+    r,c = u.shape
+    
+    for i in range(c):
+        #Get column of u and row of v
+        uj = u[:,i]
+        vj = v[i,:]
+        #Calculate associate component of data
+        yj = error + np.dot(uj,vj)
+        #update v
+        vj = np.dot(np.transpose(yj),uj)
+        vj[np.where(vj<0.0)] = eps
+        v[i,:] = vj
+        #update u
+        uj = np.dot(yj,vj)
+        uj[np.where(uj<0.0)] = eps
+        uj = uj/np.norm(uj)
+        u[:,i] = uj
+        #Recalculate error
+        error = yj - np.outer(uj,vj)
         
+    #Calculate A matrix
+    A = np.dot(u,v)
+    
     #Return the matrices
-    return {'u':u,'v':v,'A':A}
+    return u,v,A
     
 
 def update_u(u,v,T,A):
@@ -302,3 +323,16 @@ def calculate_div(T,A):
     return div
     
     
+def normalize_ucols(u):
+    #Normalize the columns of u
+    r,c = u.shape
+    
+    for i in range(c):
+        uc = u[:,i]
+        uc = uc/np.norm(uc)
+        u[:,i] = uc
+        
+    return u
+    
+def calc_error(T,u,v):
+    return t - np.dot(u,v)    
