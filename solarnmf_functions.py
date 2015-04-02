@@ -163,7 +163,7 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
     atemp = np.dot(utemp,vtemp)
     
     #Set artificial value for div
-    div_final = 1000
+    div_final = 1e+50
     #Set convergence limit for div_limit
     div_limit = 1.0e-6
     
@@ -175,7 +175,7 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
         #Print some output
         print "Starting initialization iteration ",i
         #Call the minimizer
-        utemp,vtemp,atemp,dtemp = minimize_div(utemp,vtemp,T,atemp,r_iter,div_limit)
+        utemp,vtemp,atemp,dtemp = minimize_div(utemp,vtemp,T,atemp,r_iter)
  
         #Check the new value of div
         if dtemp[-1] < div_final:
