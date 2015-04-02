@@ -204,19 +204,19 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
         
         
     
-def minimize_div(u,v,T,A,max_i,div_limit):
+def minimize_div(u,v,T,A,max_i):
     
     #Set epsilon parameter to make sure everything is non-negative
     eps = 1.0e-6
     #Initialize the div old parameter
-    div_old = 1.0e+99
+    div_old = 1.0e+50
     
     #Initialize vector for divergence metric
     div = np.zeros(max_i)
     
     #Initialize counter and change in divergence
     i = 0
-    delta_div = div_limit + 1
+    delta_div = eps + 1
     
     #Normalize the columns of u
     u = normalize_ucols(u)
@@ -224,8 +224,9 @@ def minimize_div(u,v,T,A,max_i,div_limit):
     #Calculate error matrix
     error = calc_error(T,u,v)
     
+    
     #Begin loop to minimize divergence metric
-    while i < max_i and delta_div > div_limit:
+    while i < max_i and delta_div > eps:
         
         #Update the U,V, and A matrices
         u,v,A = update_uva(u,v,T,A,error,eps)
