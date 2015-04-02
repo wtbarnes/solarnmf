@@ -30,10 +30,10 @@ u_initial,v_initial,A_initial = snf.initialize_uva(NX,NY,Q,10,50,results['T'])
 u,v,A,div = snf.minimize_div(u_initial,v_initial,results['T'],A_initial,500,1.0e-5)
 
 #Plot the total results for the observation and the prediction
-spr.plot_obsVpred(results['T'],A)
+spr.plot_mat_obsVpred(results['T'],A)
 
 #Plot the reconstructed events
-spr.plot_sim_targVpred(P,Q,u,v,results['target'])
+spr.plot_mat_targVpred(P,Q,u,v,results['target'])
     
 #Plot the convergence
 spr.plot_convergence(div)
