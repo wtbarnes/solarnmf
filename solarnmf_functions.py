@@ -208,6 +208,8 @@ def minimize_div(u,v,T,A,max_i,div_limit):
     
     #Set epsilon parameter to make sure everything is non-negative
     eps = 1.0e-6
+    #Initialize the div old parameter
+    div_old = 1.0e+99
     
     #Initialize vector for divergence metric
     div = np.zeros(max_i)
@@ -232,14 +234,12 @@ def minimize_div(u,v,T,A,max_i,div_limit):
         d = calculate_div(T,A)
         #Save the value
         div[i] = d
-        #Calculate the change in the metric
-        if i > 0:
-            delta_div = np.fabs(d-div[i-1])
-            
-        #Print progress (skip for initialization runs)
-        if max_i > 20:
-            print "i = ",i
-            print "div = ",d
+
+        #Calculate the difference
+        delta_div = np.fabs(d - div_old)
+        
+        #Set the current div as the old
+        div_old  = div
         
         #Increment the counter 
         i = i+1
@@ -305,27 +305,29 @@ def calculate_div(T,A):
     #Kullback-Leibler divergence
     
     #Initialize the sum
-    div = 0
+    #div = 0
     
     #Get dimensions of A
-    m,n = A.shape
+    #m,n = A.shape
     
     #Loop to sum
-    for i in range(m):
-        for j in range(n):
-            
-            #Break up into terms
-            term_1 = T[i,j]*np.log(T[i,j]/A[i,j])
-            if T[i,j] == 0:
-                term_1 = 0
-            
-            term_2 = -T[i,j]
-            term_3 = A[i,j]
-            
-            #Add the terms
-            div = div + term_1 + term_2 + term_3
-            
-            
+    #for i in range(m):
+    #    for j in range(n):
+    #        
+    #        #Break up into terms
+    #        term_1 = T[i,j]*np.log(T[i,j]/A[i,j])
+    #        if T[i,j] == 0:
+    #            term_1 = 0
+    #        
+    #        term_2 = -T[i,j]
+    #        term_3 = A[i,j]
+    #       
+    #        #Add the terms
+    #        div = div + term_1 + term_2 + term_3
+    
+    #Use different convergence measure
+    div = np.linalg.norm(T - A)/np.linalg.norm(A)
+                 
     #Return the value
     return div
     
