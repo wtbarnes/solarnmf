@@ -262,7 +262,7 @@ def update_uva(u,v,T,A,error,eps):
         #update u
         uj = np.dot(yj,vj)
         uj[np.where(uj<0.0)] = eps
-        uj = uj/np.norm(uj)
+        uj = uj/np.linalg.norm(uj)
         u[:,i] = uj
         #Recalculate error
         error = yj - np.outer(uj,vj)
@@ -328,7 +328,7 @@ def normalize_ucols(u):
     
     for i in range(c):
         uc = u[:,i]
-        uc = uc/np.norm(uc)
+        uc = uc/np.linalg.norm(uc)
         u[:,i] = uc
         
     return u
