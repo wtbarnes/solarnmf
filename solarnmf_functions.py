@@ -172,12 +172,10 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
         #Print some output
         print "Starting initialization iteration ",i
         #Call the minimizer
-        utemp,vtemp,atemp,div = minimize_div(utemp,vtemp,T,atemp,r_iter,div_limit)
-        #Get the last value of the divergence measure
-        d_temp = div_temp[-1]
-        
+        utemp,vtemp,atemp,dtemp = minimize_div(utemp,vtemp,T,atemp,r_iter,div_limit)
+ 
         #Check the new value of div
-        if d_temp < div_final:
+        if d_temp[-1] < div_final:
             div_final = d_temp
             u = utemp
             v = vtemp
