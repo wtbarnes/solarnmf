@@ -172,16 +172,15 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
         #Print some output
         print "Starting initialization iteration ",i
         #Call the minimizer
-        temp = minimize_div(utemp,vtemp,T,atemp,r_iter,div_limit)
+        utemp,vtemp,atemp,div = minimize_div(utemp,vtemp,T,atemp,r_iter,div_limit)
         #Get the last value of the divergence measure
-        div_temp = temp['div']
         d_temp = div_temp[-1]
         
         #Check the new value of div
         if d_temp < div_final:
             div_final = d_temp
-            u = temp['u']
-            v = temp['v']
+            u = utemp
+            v = vtemp
         
         #Generate next random u and v
         utemp = np.random.rand(ny,q)
@@ -192,7 +191,7 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
     A = np.dot(u,v)
         
     #Return u and v values with lowest final div value
-    return {'u':u, 'v':v, 'A':A}
+    return u,v,A
         
         
     
