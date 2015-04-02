@@ -175,7 +175,7 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
         utemp,vtemp,atemp,dtemp = minimize_div(utemp,vtemp,T,atemp,r_iter,div_limit)
  
         #Check the new value of div
-        if d_temp[-1] < div_final:
+        if dtemp[-1] < div_final:
             div_final = d_temp
             u = utemp
             v = vtemp
