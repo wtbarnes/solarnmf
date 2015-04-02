@@ -334,4 +334,4 @@ def normalize_ucols(u):
     return u
     
 def calc_error(T,u,v):
-    return t - np.dot(u,v)    
+    return T - np.dot(u,v)    
