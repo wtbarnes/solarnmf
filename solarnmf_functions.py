@@ -167,6 +167,9 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
     #Set convergence limit for div_limit
     div_limit = 1.0e-6
     
+    #Initialize flag
+    good_start = False
+    
     #Begin loop to check divergence criteria
     for i in range(r):
         #Print some output
@@ -179,11 +182,19 @@ def initialize_uva(nx,ny,q,r,r_iter,T):
             div_final = d_temp
             u = utemp
             v = vtemp
+            good_start = True
+            break
         
         #Generate next random u and v
         utemp = np.random.rand(ny,q)
         vtemp = np.random.rand(q,nx)
         atemp = np.dot(utemp,vtemp)
+        
+    #Check if u,v for decent div value were found
+    if good_start == False:
+        print "Initializing with matrices yielding div = ",dtemp[-1]
+        u = utemp
+        v = vtemp
         
     #Create the initial a matrix from the initial u and v matrices
     A = np.dot(u,v)
