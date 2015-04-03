@@ -22,7 +22,7 @@ class SeparateSources(object):
         print "Guessed number of sources ",self.q
         
     
-    def minimize_div(self,)
+    def minimize_div(self,):
         
     
     def update_uva(self,u,v):
