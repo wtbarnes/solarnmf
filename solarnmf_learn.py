@@ -20,7 +20,6 @@ class SeparateSources(object):
         self.r = 10
         self.r_iter = 10
         
-        #Give some output
         print "Using ",self.div_measure," divergence measure."
         print "Using ",self.update_rules," update rules."
         print "Guessed number of sources ",self.q
