@@ -16,7 +16,7 @@ class SeparateSources(object):
         self.q = q
         
         self.eps = 1.0e-5
-        self.max_i = 500
+        self.max_i = 10000
         self.r = 10
         self.r_iter = 10
         
@@ -116,9 +116,9 @@ class SeparateSources(object):
         """Calculate selected divergence measure between observation T and prediction A"""
         
         div = 0.0
+        m,n = self.T.shape
         
         if self.div_measure == 'kullback_leibler':
-            m,n = self.T.shape
             for i in range(m):
                 for j in range(n):
                     if self.T[i,j] == 0.0:
