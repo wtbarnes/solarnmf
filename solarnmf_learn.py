@@ -14,8 +14,10 @@ class SeparateSources(object):
         self.div_measure = div_measure
         self.update_rules = update_rules
         self.q = q
+        self.ny,self.nx = self.T.shape
         
         self.eps = 1.0e-5
+        self.psi = 1.0e-12
         self.max_i = 10000
         self.r = 10
         self.r_iter = 10
@@ -28,9 +30,7 @@ class SeparateSources(object):
     def initialize_uva(self):
         """Initialize the u,v,A matrices by doing a preliminary minimization and using the u,v which give the smallest div."""
         
-        ny,nx = self.T.shape
-        
-        u_temp,v_temp = np.random.rand(ny,self.q), np.random.rand(self.q,nx)
+        u_temp,v_temp = np.random.rand(self.ny,self.q), np.random.rand(self.q,self.nx)
         a_temp = np.dot(u_temp,v_temp)
         u,v,A = u_temp, v_temp, a_temp
         
@@ -47,7 +47,7 @@ class SeparateSources(object):
                 v = v_temp
                 A = np.dot(u,v)
                 
-            u_temp,v_temp = np.random.rand(ny,self.q), np.random.rand(self.q,nx)
+            u_temp,v_temp = np.random.rand(self.ny,self.q), np.random.rand(self.q,self.nx)
             a_temp = np.dot(u_temp,v_temp)
              
         return u,v,A
@@ -91,19 +91,34 @@ class SeparateSources(object):
                 vi = v[i,:]
                 ti = error + np.outer(ui,vi)
                 
-                vi = np.dot(np.transpose(ti),ui)
-                vi[np.where(vi<0.0)] = self.eps
+                vi = np.dot(np.transpose(ti),ui)/(np.linalg.norm(ui)**2 + self.psi)
+                vi[np.where(vi<0.0)] = self.psi
                 v[i,:] = vi
                 
-                ui = np.dot(ti,vi)
-                ui[np.where(ui<0.0)] = self.eps
-                ui /= np.linalg.norm(ui)
+                ui = np.dot(ti,vi)/(np.linalg.norm(vi)**2 + self.psi)
+                ui[np.where(ui<0.0)] = self.psi
                 u[:,i] = ui
                 
                 error = ti - np.outer(ui,vi)
                       
         elif self.update_rules == 'lee_seung_kl':
-            print "Don't use this option yet."
+            
+            for i in range(self.q):
+                ui = u[:,i]
+                vi = v[i,:]
+                ti = error + np.outer(ui,vi)
+                
+                vi = vi*(np.dot(np.transpose(ui),ti/np.dot(ui,vi)))/(np.dot(np.transpose(ui),np.ones((self.ny,self.nx))) + self.psi)
+                vi /= np.linalg.norm(vi)**2 + self.psi
+                vi[np.where(vi < 0.0)] = self.psi
+                v[i,:] = vi
+                
+                ui = ui*(np.dot(ti/np.dot(ui,vi),np.transpose(vi)))/(np.dot(np.ones((self.ny,self.nx)),np.transpose(vi)) + self.psi)
+                ui /= np.linalg.norm(ui)**2 + self.psi
+                ui[np.where(ui < 0.0)] = self.psi
+                u[:,i] = ui
+                
+                error = ti - np.outer(ui,vi)
             
         else:
             raise ValueError("Unknown update rule option.")
@@ -116,12 +131,11 @@ class SeparateSources(object):
         """Calculate selected divergence measure between observation T and prediction A"""
         
         div = 0.0
-        m,n = self.T.shape
         
         if self.div_measure == 'kullback_leibler':
-            for i in range(m):
-                for j in range(n):
-                    if self.T[i,j] == 0.0:
+            for i in range(self.ny):
+                for j in range(self.nx):
+                    if self.T[i,j] == 0.0 or A[i,j] == 0.0:
                         term1 = 0.0
                     else:
                         term1 = self.T[i,j]*np.log(self.T[i,j]/A[i,j])
