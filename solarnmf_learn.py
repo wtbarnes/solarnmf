@@ -135,7 +135,7 @@ class SeparateSources(object):
         if self.div_measure == 'kullback_leibler':
             for i in range(self.ny):
                 for j in range(self.nx):
-                    if self.T[i,j] == 0.0 or A[i,j] == 0.0:
+                    if self.T[i,j] == 0.0:
                         term1 = 0.0
                     else:
                         term1 = self.T[i,j]*np.log(self.T[i,j]/A[i,j])
