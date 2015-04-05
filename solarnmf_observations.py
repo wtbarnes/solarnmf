@@ -87,7 +87,7 @@ class MakeData(object):
     def make_gaussians(self):
         """Construct simulated gaussian matrices or timeseries"""
             
-        sigma = 0.15
+        sigma = 0.08
         target = []
         
         if self.input_type == 'timeseries':

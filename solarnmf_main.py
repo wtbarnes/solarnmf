@@ -11,32 +11,22 @@
 
 ###
 
-import solarnmf_functions as snf
-import solarnmf_plot_routines as spr
-import numpy as np
+from solarnmf_observations import MakeData
+from solarnmf_learn import SeparateSources
+from solarnmf_plotting import MakeBSSPlots
 
-NX = 100
-NY = 100
-P = 4
-Q = 3
+nx = 50
+ny = 50
+q = 5
 
-#Simulate some data
-results = snf.make_t_matrix("simulation",nx=NX,ny=NY,p=P,format='matrix')
-
-#Initialize the U and V matrices
-u_initial,v_initial,A_initial = snf.initialize_uva(NX,NY,Q,10,50,results['T'])
-
-#Start the minimizer
-u,v,A,div = snf.minimize_div(u_initial,v_initial,results['T'],A_initial,500)
-
-#Plot the total results for the observation and the prediction
-spr.plot_mat_obsVpred(results['T'],A)
-
-#Plot the reconstructed events
-spr.plot_mat_targVpred(P,Q,u,v,results['target'])
-    
-#Plot the convergence
-spr.plot_convergence(div)
+data = MakeData('simulation','matrix',nx=nx,ny=ny,q=q)
+target,T = data.make_t_matrix()
+minimizer = SeparateSources(T,q,'frobenius_norm','HALS')
+u_temp,v_temp,A_temp = minimizer.initialize_uva()
+u,v,A,div = minimizer.minimize_div(u_temp,v_temp,minimizer.max_i)
+plotter = MakeBSSPlots('simulation','matrix',u,v,A,T,div,target=target)
+plotter.plot_obs_pred_total()
+plotter.plot_div()
 
 
 

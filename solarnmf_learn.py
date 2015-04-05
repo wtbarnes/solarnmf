@@ -18,7 +18,7 @@ class SeparateSources(object):
         
         self.eps = 1.0e-5
         self.psi = 1.0e-12
-        self.max_i = 10000
+        self.max_i = 1000
         self.r = 10
         self.r_iter = 10
         
