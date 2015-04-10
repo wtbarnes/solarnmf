@@ -18,6 +18,9 @@ class MakeData(object):
         self.toption = toption
         self.input_type = input_type
         
+        self.sigma = 0.08
+        self.psi = 1.0e-12
+        
         #Check timeseries options
         if self.input_type == 'timeseries':
             if 'angle' not in kwargs:
@@ -60,6 +63,7 @@ class MakeData(object):
         if self.toption == 'simulation':
             #Call the make gaussians function
             target,T = self.make_gaussians()
+            T[np.where(T<self.psi)] = self.psi
             
             if self.input_type == 'matrix':
                 return target,T
@@ -72,6 +76,7 @@ class MakeData(object):
             
             T = np.loadtxt(self.filename)
             T /= np.max(T)
+            T[np.where(T<self.psi)] = self.psi
             
             if self.input_type == 'matrix':
                 return T
@@ -87,7 +92,6 @@ class MakeData(object):
     def make_gaussians(self):
         """Construct simulated gaussian matrices or timeseries"""
             
-        sigma = 0.08
         target = []
         
         if self.input_type == 'timeseries':
@@ -103,7 +107,7 @@ class MakeData(object):
                 else:
                     mu_sign = 1.0
                 #Create the Gaussian
-                temp = np.random.rand()*np.exp(-(t+mu_sign*np.random.rand())**2/(2.0*sigma**2))
+                temp = np.random.rand()*np.exp(-(t+mu_sign*np.random.rand())**2/(2.0*self.sigma**2))
                 #Add to total
                 T = T + temp
                 #Save the components
@@ -114,8 +118,8 @@ class MakeData(object):
             
         elif self.input_type == 'matrix':
             #Calculate standard deviations in x and y
-            sigma_x = sigma*np.ones((1,self.p))
-            sigma_y = sigma*np.ones((1,self.p))
+            sigma_x = self.sigma*np.ones((1,self.p))
+            sigma_y = self.sigma*np.ones((1,self.p))
 
             #Generate random center positions for pulses (normalized to [0,1])
             centers = np.random.rand(self.p,2)
@@ -147,17 +151,17 @@ class MakeData(object):
     def ts_to_mat(self,x):
         """Format timeseries as matrix for NMF or BSS factorization."""
             
-        x_smooth = self.ts_smooth(x,window_length=11,window='hanning')
+        #x_smooth = self.ts_smooth(x,window_length=11,window='hanning')
         
-        x_mat = self.ts_by_gaussian(x_smooth,len(x_smooth),0.15)
+        x_mat = self.ts_by_gaussian(x,self.ny,0.15)
         
-        if angle != 0:
+        if self.angle != 0:
             x_mat  = self.crop_and_rotate(x_mat,self.angle)
             
         return x_mat
         
             
-    def ts_smooth(x,**kwargs):
+    def ts_smooth(self,x,**kwargs):
         """Smoothing algorithm from Scipy.org Cookbook. URL: http://wiki.scipy.org/Cookbook/SignalSmooth
 
         Parameters
@@ -207,7 +211,7 @@ class MakeData(object):
         return np.convolve(w/w.sum(),s,mode='valid')
         
     
-    def ts_by_gaussian(x,dim2,sigma):
+    def ts_by_gaussian(self,x,dim2,sigma):
         """Convert time series to matrix with some spread defined by a gaussian with standard deviation sigma."""
     
         #Set up Gaussian to filter results through
@@ -224,7 +228,7 @@ class MakeData(object):
         return np.transpose(np.dot(x_mat,np.transpose(xfilt_mat)))
         
         
-    def crop_and_rotate(x_mat,angle):
+    def crop_and_rotate(self,x_mat,angle):
     
         #Find the backgound value
         bg_val = np.min(x_mat[np.where(x_mat>np.max(x_mat)/100.0)])

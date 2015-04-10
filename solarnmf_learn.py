@@ -18,7 +18,11 @@ class SeparateSources(object):
         
         self.eps = 1.0e-5
         self.psi = 1.0e-12
-        self.max_i = 1000
+        self.sparse_u = 0.125
+        self.sparse_v = 0.125
+        self.reg_a0 = 0
+        self.reg_tau = 50
+        self.max_i = 500
         self.r = 10
         self.r_iter = 10
         
@@ -32,6 +36,8 @@ class SeparateSources(object):
         
         u_temp,v_temp = np.random.rand(self.ny,self.q), np.random.rand(self.q,self.nx)
         a_temp = np.dot(u_temp,v_temp)
+        u_temp = self.normalize_cols(u_temp)
+        
         u,v,A = u_temp, v_temp, a_temp
         
         div_current = 1.0e+50
@@ -49,6 +55,7 @@ class SeparateSources(object):
                 
             u_temp,v_temp = np.random.rand(self.ny,self.q), np.random.rand(self.q,self.nx)
             a_temp = np.dot(u_temp,v_temp)
+            u_temp = self.normalize_cols(u_temp)
              
         return u,v,A
         
@@ -62,14 +69,13 @@ class SeparateSources(object):
         
         div = np.zeros(max_iter)
         
-        u = self.normalize_cols(u)
         error = self.T - np.dot(u,v)
         
         while i < max_iter and delta_div > self.eps:
             
-            u,v,A = self.update_uva(u,v,error)
+            u,v,A = self.update_uva(u,v,i)
             
-            div[i] = self.calculate_div(A)
+            div[i] = self.calculate_div(u,v,A,i)
             
             print "At iteration ",i," with divergence ",div[i]
             
@@ -80,54 +86,47 @@ class SeparateSources(object):
         div = div[0:i]
         
         return u,v,A,div
+        
     
-    def update_uva(self,u,v,error):
+    def update_uva(self,u,v,k):
         """Update u,v,A matrices using selected update rules."""
         
-        if self.update_rules == 'HALS':
+        if self.update_rules == 'ALS_reg_sparse':
             
-            for i in range(self.q):
-                ui = u[:,i]
-                vi = v[i,:]
-                ti = error + np.outer(ui,vi)
-                
-                vi = np.dot(np.transpose(ti),ui)/(np.linalg.norm(ui)**2 + self.psi)
-                vi[np.where(vi<0.0)] = self.psi
-                v[i,:] = vi
-                
-                ui = np.dot(ti,vi)/(np.linalg.norm(vi)**2 + self.psi)
-                ui[np.where(ui<0.0)] = self.psi
-                u[:,i] = ui
-                
-                error = ti - np.outer(ui,vi)
-                      
+            reg_u,reg_v = self.regularize(k)
+            
+            vvt_inv = np.linalg.pinv(np.dot(v,np.transpose(v)) + reg_u*np.ones((self.q,self.q)))
+            tvt = np.dot(self.T,np.transpose(v)) - self.sparse_u*np.ones((self.ny,self.q))
+            u = np.dot(tvt,vvt_inv)
+            u[np.where(u<self.psi)] = self.psi
+            
+            utu_inv = np.linalg.pinv(np.dot(np.transpose(u),u) + reg_v*np.ones((self.q,self.q)))
+            utt = np.dot(np.transpose(u),self.T) - self.sparse_v*np.ones((self.q,self.nx))
+            v = np.dot(utu_inv,utt)
+            v[np.where(v<self.psi)] = self.psi
+            
+            u = self.normalize_cols(u) 
+                                 
         elif self.update_rules == 'lee_seung_kl':
             
-            for i in range(self.q):
-                ui = u[:,i]
-                vi = v[i,:]
-                ti = error + np.outer(ui,vi)
-                
-                vi = vi*(np.dot(np.transpose(ui),ti/np.dot(ui,vi)))/(np.dot(np.transpose(ui),np.ones((self.ny,self.nx))) + self.psi)
-                vi /= np.linalg.norm(vi)**2 + self.psi
-                vi[np.where(vi < 0.0)] = self.psi
-                v[i,:] = vi
-                
-                ui = ui*(np.dot(ti/np.dot(ui,vi),np.transpose(vi)))/(np.dot(np.ones((self.ny,self.nx)),np.transpose(vi)) + self.psi)
-                ui /= np.linalg.norm(ui)**2 + self.psi
-                ui[np.where(ui < 0.0)] = self.psi
-                u[:,i] = ui
-                
-                error = ti - np.outer(ui,vi)
+            u = u*np.dot(self.T/np.dot(u,v),np.transpose(v))/(np.dot(np.ones((self.ny,self.nx)),np.transpose(v)) + self.psi)
+            v = v*np.dot(np.transpose(u),self.T/np.dot(u,v))/(np.dot(np.transpose(u),np.ones((self.ny,self.nx))) + self.psi)
+        
+        elif self.update_rules == 'lee_seung_fn':
             
+            v = v*np.dot(np.transpose(u),self.T)/(np.dot(np.dot(np.transpose(u),u),v) + self.psi)
+            u = u*np.dot(self.T,np.transpose(v))/(np.dot(np.dot(u,v),np.transpose(v)) + self.psi)                          
+        
         else:
             raise ValueError("Unknown update rule option.")
+            
+        u = self.normalize_cols(u)
             
         A = np.dot(u,v)
         
         return u,v,A
     
-    def calculate_div(self,A):
+    def calculate_div(self,u,v,A,k):
         """Calculate selected divergence measure between observation T and prediction A"""
         
         div = 0.0
@@ -142,10 +141,17 @@ class SeparateSources(object):
                         
                     term2 = -self.T[i,j]
                     term3 = A[i,j]
-                    div = div + (term1 + term2 + term3)
+                    div += (term1 + term2 + term3)
                     
         elif self.div_measure == 'frobenius_norm':
-            div = 0.5*np.trace(np.dot(np.transpose(self.T - A),self.T - A))
+            div = 0.5*np.linalg.norm(self.T - A,'fro')**2
+        
+        elif self.div_measure == 'frobenius_norm_reg_sparse':
+            reg_u,reg_v = self.regularize(k)
+            reg_term_u = reg_u*np.trace(np.dot(np.dot(u,np.ones((self.q,self.q))),np.transpose(u)))
+            reg_term_v = reg_v*np.trace(np.dot(np.dot(np.transpose(v),np.ones((self.q,self.q))),v))
+            
+            div = 0.5*(np.linalg.norm(self.T - A,'fro')**2 + reg_term_u + reg_term_v) + self.sparse_u*u.sum() + self.sparse_v*v.sum()
             
         else:
             raise ValueError("Unknown divergence calculation option.")
@@ -162,3 +168,12 @@ class SeparateSources(object):
             X[:,i] = xj
             
         return X
+        
+    def regularize(self,k):
+        """Calculate regularization parameter that varies with iteration"""
+        reg_u = self.reg_a0*np.exp(-k/self.reg_tau)
+        reg_v = self.reg_a0*np.exp(-k/self.reg_tau)
+        
+        return reg_u,reg_v
+        
+        
