@@ -71,11 +71,15 @@ class MakeBSSPlots(object):
             for i in range(rows):
                 try:
                     ax[i,0].imshow(self.target[i],cmap=self.cm)
+                    ax[i,0].xaxis.set_ticklabels([])
+                    ax[i,0].yaxis.set_ticklabels([])
                     fig.colorbar()
                 except:
                     pass
                 try:
                     ax[i,1].imshow(np.outer(self.u[:,i],self.v[i,:]),cmap=self.cm)
+                    ax[i,1].xaxis.set_ticklabels([])
+                    ax[i,1].yaxis.set_ticklabels([])
                     fig.colorbar()
                 except:
                     pass

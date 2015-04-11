@@ -20,8 +20,8 @@ class MakeData(object):
         
         self.sigma = 0.08
         self.psi = 1.0e-12
-        self.ngrid_y = 10
-        self.ngrid_x = 10
+        self.ngrid_y = 9
+        self.ngrid_x = 9
         self.noise_level = 0.05
         
         #Check timeseries options
@@ -127,8 +127,8 @@ class MakeData(object):
             
         elif self.input_type == 'matrix':
             #Calculate standard deviations in x and y
-            sigma_x = float(self.grid_x/2)*np.ones((1,self.p))
-            sigma_y = float(self.grid_y/2)*np.ones((1,self.p))
+            sigma_x = float(self.grid_x/2.0)*np.ones((1,self.p))
+            sigma_y = float(self.grid_y/2.0)*np.ones((1,self.p))
             
             #Generate random center positions for pulses (normalized to [0,1])
             centers = []

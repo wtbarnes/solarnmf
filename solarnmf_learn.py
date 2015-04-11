@@ -16,11 +16,11 @@ class SeparateSources(object):
         self.q = q
         self.ny,self.nx = self.T.shape
         
-        self.eps = 1.0e-5
+        self.eps = 1.0e-3
         self.psi = 1.0e-12
         self.sparse_u = 0.125
         self.sparse_v = 0.125
-        self.reg_a0 = 0.0
+        self.reg_a0 =   20.0
         self.reg_tau = 50.0
         self.max_i = 1000
         self.r = 10

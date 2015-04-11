@@ -15,9 +15,9 @@ from solarnmf_observations import MakeData
 from solarnmf_learn import SeparateSources
 from solarnmf_plotting import MakeBSSPlots
 
-nx = 100
-ny = 100
-p = 5
+nx = 50
+ny = 50
+p = 3
 q = p
 
 data = MakeData('simulation','matrix',nx=nx,ny=ny,p=p)
