@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class MakeBSSPlots(object):
-    
+
     def __init__(self,toption,input_type,u,v,A,T,div,**kwargs):
         self.toption = toption
         self.input_type = input_type
@@ -32,8 +32,8 @@ class MakeBSSPlots(object):
                 self.ny = kwargs['Tmat'].shape[0]
             except:
                 raise ValueError("Please specify matrix representation of time series when using 1D representation.")
-                
-                
+
+
     def plot_obs_pred_total(self,**kwargs):
         if self.input_type == 'matrix':
             fig,ax = plt.subplots(1,2,figsize=self.fig_size)
@@ -43,7 +43,7 @@ class MakeBSSPlots(object):
             ax[1].set_title(r'$A$, Prediction',fontsize=self.fs)
             fig.colorbar(imT,ax=ax[0])
             fig.colorbar(imA,ax=ax[1])
-                
+
         elif self.input_type == 'timeseries':
             fig = plt.figure(figsize=self.fig_size)
             ax = fig.gca()
@@ -51,19 +51,22 @@ class MakeBSSPlots(object):
             ax.plot(self.A[int(self.ny/2),:],'r',label='Prediction')
             ax.set_title('Composite Time Series Comparison',fontsize=self.fs)
             ax.legend(loc=2)
-        
+
         else:
             raise ValueError("Invalid input type option.")
-            
+
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
         else:
             plt.show()
-            
-            
+
+
     def plot_obs_pred_sources(self,**kwargs):
-        rows = max(self.q,len(self.target))
-        
+        try:
+            rows = max(self.q,len(self.target))
+        except:
+            rows = self.q
+
         if self.input_type == 'matrix':
             fig,ax = plt.subplots(rows,2,figsize=self.fig_size)
             ax[0,0].set_title(r'Sources',fontsize=self.fs)
@@ -98,18 +101,18 @@ class MakeBSSPlots(object):
                     pass
                 if i == rows-1:
                     ax[i].set_xlabel(r'$t$ (arb. units)',fontsize=self.fs)
-                
+
             ax[0].legend(loc=2)
-            
+
         else:
             raise ValueError("Invalid input type option")
-                
+
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
         else:
             plt.show()
-    
-            
+
+
     def plot_div(self,**kwargs):
         fig = plt.figure(figsize=self.fig_size)
         ax = fig.gca()
@@ -118,10 +121,8 @@ class MakeBSSPlots(object):
         ax.set_title(r'Divergence Measure',fontsize=self.fs)
         ax.set_xlabel(r'iteration',fontsize=self.fs)
         ax.set_ylabel(r'$d(T,A)$',fontsize=self.fs)
-        
+
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
         else:
             plt.show()
-                
-        
