@@ -10,7 +10,7 @@ class SeparateSources(object):
     """Class that performs BSS using specified method for given observation matrix"""
     
     def __init__(self,T,q,div_measure,update_rules,**kwargs):
-        self.T = T
+        self.T = T#self.normalize_cols(T)
         self.div_measure = div_measure
         self.update_rules = update_rules
         self.q = q
@@ -20,9 +20,9 @@ class SeparateSources(object):
         self.psi = 1.0e-12
         self.sparse_u = 0.125
         self.sparse_v = 0.125
-        self.reg_a0 = 0
-        self.reg_tau = 50
-        self.max_i = 500
+        self.reg_a0 = 0.0
+        self.reg_tau = 50.0
+        self.max_i = 1000
         self.r = 10
         self.r_iter = 10
         
@@ -36,7 +36,7 @@ class SeparateSources(object):
         
         u_temp,v_temp = np.random.rand(self.ny,self.q), np.random.rand(self.q,self.nx)
         a_temp = np.dot(u_temp,v_temp)
-        u_temp = self.normalize_cols(u_temp)
+        #u_temp = self.normalize_cols(u_temp)
         
         u,v,A = u_temp, v_temp, a_temp
         
@@ -48,14 +48,14 @@ class SeparateSources(object):
             u_temp,v_temp,a_temp,div_temp = self.minimize_div(u_temp,v_temp,self.r_iter)
             
             if div_temp[-1] < div_current:
-                div_cuurent = div_temp[-1]
+                div_current = div_temp[-1]
                 u = u_temp
                 v = v_temp
                 A = np.dot(u,v)
                 
             u_temp,v_temp = np.random.rand(self.ny,self.q), np.random.rand(self.q,self.nx)
             a_temp = np.dot(u_temp,v_temp)
-            u_temp = self.normalize_cols(u_temp)
+            #u_temp = self.normalize_cols(u_temp)
              
         return u,v,A
         
@@ -105,8 +105,10 @@ class SeparateSources(object):
             v = np.dot(utu_inv,utt)
             v[np.where(v<self.psi)] = self.psi
             
-            u = self.normalize_cols(u) 
-                                 
+        #elif self.update_rules == 'rHALS':
+            
+            
+                                             
         elif self.update_rules == 'lee_seung_kl':
             
             u = u*np.dot(self.T/np.dot(u,v),np.transpose(v))/(np.dot(np.ones((self.ny,self.nx)),np.transpose(v)) + self.psi)
@@ -120,7 +122,7 @@ class SeparateSources(object):
         else:
             raise ValueError("Unknown update rule option.")
             
-        u = self.normalize_cols(u)
+        #u = self.normalize_cols(u)
             
         A = np.dot(u,v)
         
@@ -171,8 +173,8 @@ class SeparateSources(object):
         
     def regularize(self,k):
         """Calculate regularization parameter that varies with iteration"""
-        reg_u = self.reg_a0*np.exp(-k/self.reg_tau)
-        reg_v = self.reg_a0*np.exp(-k/self.reg_tau)
+        reg_u = self.reg_a0*np.exp(-float(k)/self.reg_tau)
+        reg_v = self.reg_a0*np.exp(-float(k)/self.reg_tau)
         
         return reg_u,reg_v
         

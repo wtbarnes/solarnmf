@@ -20,6 +20,9 @@ class MakeData(object):
         
         self.sigma = 0.08
         self.psi = 1.0e-12
+        self.ngrid_y = 10
+        self.ngrid_x = 10
+        self.noise_level = 0.05
         
         #Check timeseries options
         if self.input_type == 'timeseries':
@@ -48,6 +51,10 @@ class MakeData(object):
                 print "p not specified. Setting p to ",self.p
             else:
                 self.p = kwargs['p']
+                
+            self.grid_y = int(self.ny/self.ngrid_y)
+            self.grid_x = int(self.nx/self.ngrid_x)
+            
         elif self.toption == 'data':
             if 'filename' not in kwargs:
                 raise ValueError("'filename' needs to be specified in kwargs in order to load data.")
@@ -94,6 +101,9 @@ class MakeData(object):
             
         target = []
         
+        #Seed random number generator
+        np.random.seed()
+        
         if self.input_type == 'timeseries':
             #Initialize total
             T = 0.0
@@ -101,6 +111,7 @@ class MakeData(object):
             #Create series of Gaussians
             t = np.linspace(-1,1,self.nx)
             for i in range(self.p):
+                
                 #Get random sign
                 if np.random.rand() > 0.5:
                     mu_sign = -1.0
@@ -113,37 +124,45 @@ class MakeData(object):
                 #Save the components
                 target.append(temp)
                 
-            #Normalize the T matrix
-            T = T/np.max(T)
             
         elif self.input_type == 'matrix':
             #Calculate standard deviations in x and y
-            sigma_x = self.sigma*np.ones((1,self.p))
-            sigma_y = self.sigma*np.ones((1,self.p))
-
+            sigma_x = float(self.grid_x/2)*np.ones((1,self.p))
+            sigma_y = float(self.grid_y/2)*np.ones((1,self.p))
+            
             #Generate random center positions for pulses (normalized to [0,1])
-            centers = np.random.rand(self.p,2)
+            centers = []
+            for i in range(self.ngrid_y):
+                for j in range(self.ngrid_x):
+                    centers.append(((i + 0.5)*self.grid_y,(j + 0.5)*self.grid_x))
+                    
+            n_centers  = self.ngrid_y*self.ngrid_x
 
             #Preallocate for T matrix
             T = np.zeros((self.ny,self.nx))
 
             #Set up the X and Y meshes
-            X,Y = np.meshgrid(np.linspace(0,1,self.nx),np.linspace(0,1,self.ny))
+            X,Y = np.meshgrid(np.linspace(0,self.nx-1,self.nx),np.linspace(0,self.ny-1,self.ny))
 
             #Calculate the Gaussian pulses and add them to the T matrix
             for i in range(self.p):
+                i_center = np.random.randint(0,n_centers-1)
                 #Calculate Gaussian pulse
-                z = np.exp(-1/(2*(sigma_x[0,i])**2)*((X - centers[i,0])**2) - 1/(2*(sigma_y[0,i])**2)*((Y - centers[i,1])**2))
+                z = np.exp(-1/(2*(sigma_x[0,i])**2)*((X - centers[i_center][1])**2) - 1/(2*(sigma_y[0,i])**2)*((Y - centers[i_center][0])**2))
                 #Add to total T matrix
                 T = T + z
                 #Save the events that make up the T matrix
                 target.append(z)
-
-            #Normalize the T matrix to one
-            T = T/np.max(T)
+                #Update centers list and length
+                centers.remove(centers[i_center])
+                n_centers += -1
+                
             
         else:
             raise ValueError("Unknown input type. Use either 'timeseries' or 'matrix'.")
+            
+        T = self.add_noise(T)    
+        T = T/np.max(T)
             
         return target,T
         
@@ -245,5 +264,12 @@ class MakeData(object):
     
         #Return trimmed matrix
         return x_rot[top:bottom,left:right]
+        
+    def add_noise(self,mat):
+        """Add noise to matrix"""
+        nr,nc = mat.shape
+        np.random.seed()
+        mat_noise = self.noise_level*np.random.rand(nr,nc)
+        return mat + mat_noise
         
         
