@@ -9,22 +9,22 @@ import numpy as np
 class SeparateSources(object):
     """Class that performs BSS using specified method for given observation matrix"""
 
-    def __init__(self,T,q,div_measure,update_rules,**kwargs):
+    def __init__(self,T,q,params,**kwargs):
         self.T = T#self.normalize_cols(T)
-        self.div_measure = div_measure
-        self.update_rules = update_rules
         self.q = q
         self.ny,self.nx = self.T.shape
 
-        self.eps = 1.0e-5
-        self.psi = 1.0e-12
-        self.sparse_u = 0.25
-        self.sparse_v = 0.25
-        self.reg_a0 = 20.0
-        self.reg_tau = 50.0
-        self.max_i = 2000
-        self.r = 10
-        self.r_iter = 10
+        self.div_measure = params['div_measure']
+        self.update_rules = params['update_rules']
+        self.eps = params['eps']
+        self.psi = params['psi']
+        self.sparse_u = params['sparse_u']
+        self.sparse_v = params['sparse_v']
+        self.reg_0 = params['reg_0']
+        self.reg_tau = params['reg_tau']
+        self.max_i = params['max_i']
+        self.r = params['r']
+        self.r_iter = params['r_iter']
 
         print "Using ",self.div_measure," divergence measure."
         print "Using ",self.update_rules," update rules."
@@ -173,7 +173,7 @@ class SeparateSources(object):
 
     def regularize(self,k):
         """Calculate regularization parameter that varies with iteration"""
-        reg_u = self.reg_a0*np.exp(-float(k)/self.reg_tau)
-        reg_v = self.reg_a0*np.exp(-float(k)/self.reg_tau)
+        reg_u = self.reg_0*np.exp(-float(k)/self.reg_tau)
+        reg_v = self.reg_0*np.exp(-float(k)/self.reg_tau)
 
         return reg_u,reg_v
