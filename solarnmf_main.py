@@ -19,11 +19,15 @@ nx = 100
 ny = 100
 p = 5
 q = p
-fn = '/data/datadrive2/AIA_fm_spectra/fp_frames/frames(AIA_131).2D_dir/frames(AIA_131).2D_frame700'
+fn = '/Users/willbarnes/Desktop/frames(AIA_131).2D_lt.v2m'
 
-params = {'eps':1.0e-6,'psi':1.0e-16,'sparse_u':0.25,'sparse_v':0.25,'reg_0':20.0,'reg_tau':50.0,'max_i':1000,'r':10,'r_iter':10}
-params['div_measure'] = 'frobenius_norm_reg_sparse'
-params['update_rules'] = 'ALS_reg_sparse'
+params = {'eps':1.0e-6,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':1000,'r':10,'r_iter':10}
+params['lambda_1'] = 0.001
+params['lambda_2'] = 0.001
+params['alpha'] = 0.8
+params['l_toeplitz'] = 5
+params['div_measure'] = 'multiplicative_reg_sparse'
+params['update_rules'] = 'chen_cichocki_reg_sparse'
 
 data = MakeData('simulation','matrix',filename=fn,nx=nx,ny=ny,p=p)
 target,T = data.make_t_matrix()

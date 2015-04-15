@@ -5,6 +5,7 @@
 
 #Import needed modules
 import numpy as np
+from scipy.linalg import toeplitz
 
 class SeparateSources(object):
     """Class that performs BSS using specified method for given observation matrix"""
@@ -25,6 +26,12 @@ class SeparateSources(object):
         self.max_i = params['max_i']
         self.r = params['r']
         self.r_iter = params['r_iter']
+        
+        self.lambda_1 = params['lambda_1']
+        self.lambda_2 = params['lambda_2']
+        self.alpha = params['alpha']
+        self.beta = 1.0 - self.alpha
+        self.l_toeplitz = params['l_toeplitz']
 
         print "Using ",self.div_measure," divergence measure."
         print "Using ",self.update_rules," update rules."
@@ -105,9 +112,40 @@ class SeparateSources(object):
             v = np.dot(utu_inv,utt)
             v[np.where(v<self.psi)] = self.psi
 
-        #elif self.update_rules == 'rHALS':
-
-
+        elif self.update_rules == 'chen_cichocki_reg_sparse':
+            
+            Q = 1.0/self.nx*np.dot(np.transpose(self.eye_minus_toeplitz()),self.eye_minus_toeplitz())
+            A = np.dot(u,v)
+            
+            def update_u(u,v,A):
+                for i in range(self.ny):
+                    for j in range(self.q):
+                        numer = 0.0
+                        for t in range(self.nx):
+                            numer += v[j,t]*self.T[i,t]/A[i,t]
+                        u[i,j] = u[i,j]*numer/(np.sum(v[j,:]))
+                u[np.where(u<self.psi)] = self.psi
+                return u
+                
+            def update_v(u,v,A,Q):
+                utt = np.dot(np.transpose(u),self.T)
+                uta_vq  = np.dot(np.transpose(u),A) + self.lambda_1*np.dot(v,Q)
+                for j in range(self.q):
+                    for t in range(self.nx):
+                        v[j,t] = v[j,t]*utt[j,t]/(uta_vq[j,t] + self.lambda_2/self.nx*(np.sum(v[:,t]) - 2.0*v[j,t]))
+                v[np.where(v<self.psi)] = self.psi
+                return v
+                
+            if k%2 == 0:
+                u = update_u(u,v,A)
+                A = np.dot(u,v)
+                v = update_v(u,v,A,Q)
+                A = np.dot(u,v)
+            else:
+                v = update_v(u,v,A,Q)
+                A = np.dot(u,v)
+                u = update_u(u,v,A)
+                A = np.dot(u,v)
 
         elif self.update_rules == 'lee_seung_kl':
 
@@ -154,6 +192,19 @@ class SeparateSources(object):
             reg_term_v = reg_v*np.trace(np.dot(np.dot(np.transpose(v),np.ones((self.q,self.q))),v))
 
             div = 0.5*(np.linalg.norm(self.T - A,'fro')**2 + reg_term_u + reg_term_v) + self.sparse_u*u.sum() + self.sparse_v*v.sum()
+            
+        elif self.div_measure == 'multiplicative_reg_sparse':
+            
+            term1 = np.sum((self.T - A)**2)
+            
+            term2 = 0.0
+            emt = self.eye_minus_toeplitz()
+            for i in range(self.q):
+                term2 += np.linalg.norm(np.dot(emt,np.transpose(v[i,:])))**2
+                
+            term3 = 2.0*np.sum(np.dot(v,np.transpose(v))) - 3.0*np.trace(np.dot(v,np.transpose(v)))
+            
+            div = term1 + self.lambda_1/self.nx*term2 + self.lambda_2/(2.0*self.nx)*term3
 
         else:
             raise ValueError("Unknown divergence calculation option.")
@@ -177,3 +228,14 @@ class SeparateSources(object):
         reg_v = self.reg_0*np.exp(-float(k)/self.reg_tau)
 
         return reg_u,reg_v
+        
+    def eye_minus_toeplitz(self):
+        
+        rv,cv = np.zeros(self.nx),np.zeros(self.nx)
+        
+        rv[0] = self.beta
+        
+        for i in range(self.l_toeplitz):
+            cv[i] = (self.alpha**i)*self.beta
+        
+        return np.eye(self.nx) - toeplitz(cv,rv)

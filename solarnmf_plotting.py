@@ -38,13 +38,13 @@ class MakeBSSPlots(object):
     def plot_obs_pred_total(self,**kwargs):
         if self.input_type == 'matrix':
             fig,ax = plt.subplots(1,2,figsize=self.fig_size)
+            fig.tight_layout()
             imT = ax[0].imshow(self.T,cmap=self.cm)
             imA = ax[1].imshow(self.A,cmap=self.cm)
             ax[0].set_title(r'$T$, Observation',fontsize=self.fs)
             ax[1].set_title(r'$A$, Prediction',fontsize=self.fs)
             fig.colorbar(imT,cax=make_axes_locatable(ax[0]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)])
             fig.colorbar(imA,cax=make_axes_locatable(ax[1]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.A),(np.max(self.A)-np.min(self.A))/2.0,np.max(self.A)])
-            plt.tight_layout()
 
         elif self.input_type == 'timeseries':
             fig = plt.figure(figsize=self.fig_size)
@@ -71,6 +71,7 @@ class MakeBSSPlots(object):
 
         if self.input_type == 'matrix':
             fig,ax = plt.subplots(rows,2,figsize=self.fig_size)
+            fig.tight_layout()
             ax[0,0].set_title(r'Sources',fontsize=self.fs)
             ax[0,1].set_title(r'Predictions',fontsize=self.fs)
             for i in range(rows):
@@ -89,11 +90,10 @@ class MakeBSSPlots(object):
                     fig.colorbar(im,cax=make_axes_locatable(ax[i,1]).append_axes("right","5%",pad="3%"),ticks=[np.min(ai),(np.max(ai)-np.min(ai))/2.0,np.max(ai)])
                 except:
                     pass
-                    
-            plt.tight_layout()
-            
+                                
         elif self.input_type == 'timeseries':
             fig,ax = plt.subplots(rows,1,figsize=self.fig_size)
+            fig.tight_layout()
             ax[0].set_title(r'Sources Reconstruction',fontsize=self.fs)
             for i in range(rows):
                 ax[i].set_ylabel(r'$I$ (arb. units)',fontsize=self.fs)
@@ -109,7 +109,6 @@ class MakeBSSPlots(object):
                     ax[i].set_xlabel(r'$t$ (arb. units)',fontsize=self.fs)
 
             ax[0].legend(loc=2)
-            plt.tight_layout()
 
         else:
             raise ValueError("Invalid input type option")
