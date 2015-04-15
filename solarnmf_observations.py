@@ -160,7 +160,7 @@ class MakeData(object):
             
         else:
             raise ValueError("Unknown input type. Use either 'timeseries' or 'matrix'.")
-            
+        
         T = self.add_noise(T)    
         T = T/np.max(T)
             
@@ -267,9 +267,15 @@ class MakeData(object):
         
     def add_noise(self,mat):
         """Add noise to matrix"""
-        nr,nc = mat.shape
+
         np.random.seed()
-        mat_noise = self.noise_level*np.random.rand(nr,nc)
-        return mat + mat_noise
+        if self.input_type == 'matrix':
+            nr,nc = mat.shape
+            mat += self.noise_level*np.random.rand(nr,nc)
+        else:
+            n = mat.shape[0]
+            mat += self.noise_level*np.random.rand(n) 
+            
+        return mat 
         
         

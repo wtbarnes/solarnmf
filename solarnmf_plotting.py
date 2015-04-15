@@ -6,6 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.ndimage.interpolation import rotate
 
 class MakeBSSPlots(object):
 
@@ -17,12 +18,20 @@ class MakeBSSPlots(object):
         self.A = A
         self.T = T
         self.div = div
-        dummy,self.q = self.u.shape
+        self.q = self.u.shape[1]
+        self.ts_cut = np.unravel_index(self.A.argmax(),self.A.shape)[0]
+        
         self.fs = 18
         self.cm = 'hot'
         self.print_format = 'eps'
         self.print_dpi = 1000
         self.fig_size = (12,10)
+        
+        if 'angle' not in kwargs:
+            self.angle = 0.0
+        else:
+            self.angle = kwargs['angle']
+        
         if self.toption == 'simulation':
             try:
                 self.target = kwargs['target']
@@ -33,6 +42,9 @@ class MakeBSSPlots(object):
                 self.ny = kwargs['Tmat'].shape[0]
             except:
                 raise ValueError("Please specify matrix representation of time series when using 1D representation.")
+                
+        self.components = []
+        self.make_components()
 
 
     def plot_obs_pred_total(self,**kwargs):
@@ -50,7 +62,7 @@ class MakeBSSPlots(object):
             fig = plt.figure(figsize=self.fig_size)
             ax = fig.gca()
             ax.plot(self.T,'.k',label='Observation')
-            ax.plot(self.A[int(self.ny/2),:],'r',label='Prediction')
+            ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
             ax.set_title('Composite Time Series Comparison',fontsize=self.fs)
             ax.legend(loc=2)
 
@@ -102,7 +114,7 @@ class MakeBSSPlots(object):
                 except:
                     pass
                 try:
-                    ax[i].plot(np.outer(self.u[:,i],self.v[i,:])[int(self.ny/2),:],'r',label='prediction')
+                    ax[i].plot(self.components[i][self.ts_cut,:],'r',label='prediction')
                 except:
                     pass
                 if i == rows-1:
@@ -132,3 +144,32 @@ class MakeBSSPlots(object):
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
         else:
             plt.show()
+            
+    def make_components(self):
+        """Rotate matrices back"""
+        
+        if self.angle != 0:
+            self.A  = self.crop_and_rotate(self.A,self.angle)
+            for i in range(self.q):
+                self.components.append(self.crop_and_rotate(np.outer(self.u[:,i],self.v[i,:]),self.angle))
+        else:
+            for i in range(self.q):
+                self.components.append(np.outer(self.u[:,i],self.v[i,:]))
+            
+    def crop_and_rotate(self,x_mat,angle):
+    
+        #Find the backgound value
+        bg_val = np.min(x_mat[np.where(x_mat>np.max(x_mat)/100.0)])
+    
+        #Rotate the image and interpolate as necessary
+        x_rot = rotate(x_mat,angle)
+    
+        #Find bounds by subtracting out background
+        row_bounds,col_bounds = np.where(x_rot>bg_val)
+        top = np.min(row_bounds)
+        bottom = np.max(row_bounds)
+        left = np.min(col_bounds)
+        right = np.max(col_bounds)
+    
+        #Return trimmed matrix
+        return x_rot[top:bottom,left:right]
