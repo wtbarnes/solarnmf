@@ -18,7 +18,6 @@ class MakeData(object):
         self.toption = toption
         self.input_type = input_type
         
-        self.sigma = 0.08
         self.psi = 1.0e-12
         self.ngrid_y = 9
         self.ngrid_x = 9
@@ -54,6 +53,8 @@ class MakeData(object):
                 
             self.grid_y = int(self.ny/self.ngrid_y)
             self.grid_x = int(self.nx/self.ngrid_x)
+            self.sigma_y = float(self.grid_y/2.0)
+            self.sigma_x = float(self.grid_x/2.0)
             
         elif self.toption == 'data':
             if 'filename' not in kwargs:
@@ -100,38 +101,41 @@ class MakeData(object):
         """Construct simulated gaussian matrices or timeseries"""
             
         target = []
+        centers = []
         
         #Seed random number generator
         np.random.seed()
         
         if self.input_type == 'timeseries':
             #Initialize total
-            T = 0.0
+            T = np.zeros(self.nx)
             #Simulate 1D timeseries
             #Create series of Gaussians
-            t = np.linspace(-1,1,self.nx)
-            for i in range(self.p):
+            for i in range(self.ngrid_x):
+                centers.append((i+0.5)*self.grid_x)
                 
-                #Get random sign
-                if np.random.rand() > 0.5:
-                    mu_sign = -1.0
-                else:
-                    mu_sign = 1.0
+            t = np.linspace(0,self.nx-1,self.nx)
+            n_centers = self.ngrid_x
+            
+            for i in range(self.p):
+                i_center = np.random.randint(0,n_centers-1)
                 #Create the Gaussian
-                temp = np.random.rand()*np.exp(-(t+mu_sign*np.random.rand())**2/(2.0*self.sigma**2))
+                temp = np.exp(-(t-centers[i_center])**2/(2.0*self.sigma_x**2))
                 #Add to total
                 T = T + temp
                 #Save the components
                 target.append(temp)
+                #Update centers list
+                centers.remove(centers[i_center])
+                n_centers += -1
                 
             
         elif self.input_type == 'matrix':
             #Calculate standard deviations in x and y
-            sigma_x = float(self.grid_x/2.0)*np.ones((1,self.p))
-            sigma_y = float(self.grid_y/2.0)*np.ones((1,self.p))
+            sigma_x = self.sigma_x*np.ones((1,self.p))
+            sigma_y = self.sigma_y*np.ones((1,self.p))
             
             #Generate random center positions for pulses (normalized to [0,1])
-            centers = []
             for i in range(self.ngrid_y):
                 for j in range(self.ngrid_x):
                     centers.append(((i + 0.5)*self.grid_y,(j + 0.5)*self.grid_x))
@@ -172,10 +176,10 @@ class MakeData(object):
             
         #x_smooth = self.ts_smooth(x,window_length=11,window='hanning')
         
-        x_mat = self.ts_by_gaussian(x,self.ny,0.15)
+        x_mat = self.ts_by_gaussian(x)
         
         if self.angle != 0:
-            x_mat  = self.crop_and_rotate(x_mat,self.angle)
+            x_mat  = rotate(x_mat,self.angle)
             
         return x_mat
         
@@ -230,15 +234,16 @@ class MakeData(object):
         return np.convolve(w/w.sum(),s,mode='valid')
         
     
-    def ts_by_gaussian(self,x,dim2,sigma):
+    def ts_by_gaussian(self,x):
         """Convert time series to matrix with some spread defined by a gaussian with standard deviation sigma."""
     
         #Set up Gaussian to filter results through
-        t = np.linspace(0,1,dim2)
-        xfilt = np.exp(-(t - 0.5)**2/(2*sigma**2))
+        t = np.linspace(0,self.ny-1,self.ny)
+        mu = float(self.ny-1.0)/2.0
+        xfilt = np.exp(-(t - mu)**2/(2.0*self.sigma_y**2))
 
         #Mimic matrix multiplication
-        xfilt_mat = np.zeros([dim2,1])
+        xfilt_mat = np.zeros([self.ny,1])
         x_mat = np.zeros([len(x),1])
         xfilt_mat[:,0] = xfilt
         x_mat[:,0] = x
@@ -246,24 +251,6 @@ class MakeData(object):
         #Return the filtered matrix
         return np.transpose(np.dot(x_mat,np.transpose(xfilt_mat)))
         
-        
-    def crop_and_rotate(self,x_mat,angle):
-    
-        #Find the backgound value
-        bg_val = np.min(x_mat[np.where(x_mat>np.max(x_mat)/100.0)])
-    
-        #Rotate the image and interpolate as necessary
-        x_rot = rotate(x_mat,angle)
-    
-        #Find bounds by subtracting out background
-        row_bounds,col_bounds = np.where(x_rot>bg_val)
-        top = np.min(row_bounds)
-        bottom = np.max(row_bounds)
-        left = np.min(col_bounds)
-        right = np.max(col_bounds)
-    
-        #Return trimmed matrix
-        return x_rot[top:bottom,left:right]
         
     def add_noise(self,mat):
         """Add noise to matrix"""
