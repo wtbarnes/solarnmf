@@ -21,7 +21,7 @@ from scipy.ndimage.interpolation import rotate
 
 nx = 500
 ny = 500
-p = 9
+p = 10
 q = p
 angle = 45.0
 fn = '/Users/willbarnes/Desktop/frames(AIA_131).2D_lt.v2m'
