@@ -32,10 +32,16 @@ class SeparateSources(object):
         self.alpha = params['alpha']
         self.beta = 1.0 - self.alpha
         self.l_toeplitz = params['l_toeplitz']
-
-        print "Using ",self.div_measure," divergence measure."
-        print "Using ",self.update_rules," update rules."
-        print "Guessed number of sources ",self.q
+        
+        if 'verbose' in kwargs:
+            self.verbose = kwargs['verbose']
+        else:
+            self.verbose = False
+            
+        if self.verbose:
+            print "Using ",self.div_measure," divergence measure."
+            print "Using ",self.update_rules," update rules."
+            print "Guessed number of sources ",self.q
 
 
     def initialize_uva(self):
@@ -50,7 +56,8 @@ class SeparateSources(object):
         div_current = 1.0e+50
 
         for i in range(self.r):
-            print "Initialization iteration ",i
+            if self.verbose:
+                print "Initialization iteration ",i
 
             u_temp,v_temp,a_temp,div_temp = self.minimize_div(u_temp,v_temp,self.r_iter)
 
@@ -84,7 +91,8 @@ class SeparateSources(object):
 
             div[i] = self.calculate_div(u,v,A,i)
 
-            print "At iteration ",i," with divergence ",div[i]
+            if self.verbose:
+                print "At iteration ",i," with divergence ",div[i]
 
             delta_div = np.fabs(div[i] - div_old)
             div_old = div[i]

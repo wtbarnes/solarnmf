@@ -33,7 +33,7 @@ params['update_rules'] = 'chen_cichocki_reg_sparse'
 data = MakeData('data','timeseries',file=fn,nx=nx,ny=ny,p=p,angle=angle)
 T,Tmat = data.make_t_matrix()
 
-minimizer = SeparateSources(Tmat,q,params)
+minimizer = SeparateSources(Tmat,q,params,verbose=True)
 u_temp,v_temp,A_temp = minimizer.initialize_uva()
 u,v,A,div = minimizer.minimize_div(u_temp,v_temp,minimizer.max_i)
 
