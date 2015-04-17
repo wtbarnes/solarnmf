@@ -24,7 +24,7 @@ def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
     #Print log for each iteration 
     logger = open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.log','w')
     logger.write('worker logger -- channel: '+str(channel)+', cut = '+str(i_cut)+', q = '+str(q)+'\n')
-    logger.write('div(end) = '+str(div[-1])+', num iterations = '+len(div)+'\n')
+    logger.write('div(end) = '+str(div[-1])+', num iterations = '+str(len(div))+'\n')
     logger.close()
     #Save data
     with open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.uva','w') as f:
@@ -69,7 +69,7 @@ logger.write('solarnmf_analysis logger -- channel '+str(args.channel)+'\n')
 logger.write('Starting run at:'+str(datetime.datetime.now())+'\n')
 
 #Set parameters for the minimization
-params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':10,'r':2,'r_iter':10}
+params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':5,'r':2,'r_iter':3}
 params['lambda_1'] = 0.0001
 params['lambda_2'] = 0.0001
 params['alpha'] = 0.8
