@@ -11,7 +11,7 @@ import sys
 import argparse
 import multiprocessing
 #Import solarnmf classes
-sys.path.append('../')
+sys.path.append('/home/wtb2/Documents/solarnmf/')
 from solarnmf_observations import MakeData
 from solarnmf_learn import SeparateSources
 
