@@ -84,7 +84,7 @@ for i in range(N_ts):
         #Write to log file
         logger.write('Running minimizer for q = '+str(q[j])+' for cut '+str(i)+'\n')
         #Start process
-        mtp = multiprocessing.Process(target=minimizer_worker,args=(Tmat,T,q[j],params,logger,i,parent_write_dir,args.channel))
+        mtp = multiprocessing.Process(target=minimizer_worker,args=(Tmat,T,q[j],params,i,parent_write_dir,args.channel))
         mtp.start()
         
 
