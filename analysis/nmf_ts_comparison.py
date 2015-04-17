@@ -16,18 +16,14 @@ from solarnmf_observations import MakeData
 from solarnmf_learn import SeparateSources
 
 #Declare function for minimization process
-def minimizer_worker(Tmat,q,params,logger,i_cut,top_dir,channel):
-    #Write to log file
-    logger.write('Running minimizer for q = '+str(q)+' for cut '+str(i_cut)+'\n')
+def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
     #Start minimizer
     minimizer = SeparateSources(Tmat,q,params)
     u_i,v_i,A_i = minimizer.initialize_uva()
     u,v,A,div = minimizer.minimize_div(u_i,v_i,minimizer.max_i)
-    #Write to log file
-    logger.write('Finished minimizer for q = '+str(q)+' for cut '+str(i_cut)+' with div(end) = '+str(div[-1])+'\n')
     #Save data
     with open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.uva','w') as f:
-        pickle.dump([u,v,A,div],f)
+        pickle.dump([u,v,A,T,Tmat,div],f)
     
 
 #Parse command line arguments
@@ -85,7 +81,10 @@ for i in range(N_ts):
     logger.write('Starting runs for cut '+str(i)+' at '+str(datetime.datetime.now())+'\n')
     
     for j in range(N_q):
-        mtp = multiprocessing.Process(target=minimizer_worker,args=(Tmat,q[j],params,logger,i,parent_write_dir,args.channel))
+        #Write to log file
+        logger.write('Running minimizer for q = '+str(q[j])+' for cut '+str(i)+'\n')
+        #Start process
+        mtp = multiprocessing.Process(target=minimizer_worker,args=(Tmat,T,q[j],params,logger,i,parent_write_dir,args.channel))
         mtp.start()
         
 
