@@ -24,7 +24,7 @@ def minimizer_worker(Tmat,q,params,logger,i_cut,top_dir,channel):
     u_i,v_i,A_i = minimizer.initialize_uva()
     u,v,A,div = minimizer.minimize_div(u_i,v_i,minimizer.max_i)
     #Write to log file
-    logger.write('Finished minimizer for q = '+str(q)+' for cut '+str(i_cut)+' with div(end) = 'str(div[-1])+'\n')
+    logger.write('Finished minimizer for q = '+str(q)+' for cut '+str(i_cut)+' with div(end) = '+str(div[-1])+'\n')
     #Save data
     with open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.uva','w') as f:
         pickle.dump([u,v,A,div],f)
