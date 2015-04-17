@@ -21,6 +21,11 @@ def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
     minimizer = SeparateSources(Tmat,q,params,verbose=False)
     u_i,v_i,A_i = minimizer.initialize_uva()
     u,v,A,div = minimizer.minimize_div(u_i,v_i,minimizer.max_i)
+    #Print log for each iteration 
+    logger = open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.log','w')
+    logger.write('worker logger -- channel: '+str(channel)+', cut = '+str(i_cut)+', q = '+str(q)+'\n')
+    logger.write('div(end) = '+str(div[-1])+', num iterations = '+len(div)+'\n')
+    logger.close()
     #Save data
     with open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.uva','w') as f:
         pickle.dump([u,v,A,T,Tmat,div],f)
