@@ -82,7 +82,7 @@ class MakeData(object):
 
         else:
 
-            if type(self.filename) is str:
+            if type(self.file) is str:
                 T = np.loadtxt(self.file)
             else:
                 T = self.file
