@@ -30,7 +30,7 @@ params['l_toeplitz'] = 5
 params['div_measure'] = 'multiplicative_reg_sparse'
 params['update_rules'] = 'chen_cichocki_reg_sparse'
 
-data = MakeData('data','timeseries',filename=fn,nx=nx,ny=ny,p=p,angle=angle)
+data = MakeData('data','timeseries',file=fn,nx=nx,ny=ny,p=p,angle=angle)
 T,Tmat = data.make_t_matrix()
 
 minimizer = SeparateSources(Tmat,q,params)

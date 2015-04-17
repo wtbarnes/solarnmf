@@ -18,7 +18,7 @@ class MakeData(object):
         self.toption = toption
         self.input_type = input_type
 
-        self.psi = 1.0e-12
+        self.psi = 1.0e-16
         self.ngrid_y = 10
         self.ngrid_x = 10
         self.noise_level = 0.05
@@ -57,10 +57,10 @@ class MakeData(object):
             self.sigma_x = float(self.grid_x/2.0)
 
         elif self.toption == 'data':
-            if 'filename' not in kwargs:
-                raise ValueError("'filename' needs to be specified in kwargs in order to load data.")
+            if 'file' not in kwargs:
+                raise ValueError("'file' needs to be specified in kwargs by either a path or a variable in order to load data.")
             else:
-                self.filename = kwargs['filename']
+                self.file = kwargs['file']
         else:
             raise ValueError("Unknown observation option. Use either 'simulation' or 'data'.")
 
@@ -82,7 +82,10 @@ class MakeData(object):
 
         else:
 
-            T = np.loadtxt(self.filename)
+            if type(self.filename) is str:
+                T = np.loadtxt(self.file)
+            else:
+                T = self.file
             T /= np.max(T)
             T[np.where(T<self.psi)] = self.psi
 
