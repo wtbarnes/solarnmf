@@ -22,12 +22,12 @@ parser.add_argument("-l","--loop_location",help="AR time series location")
 args = parser.parse_args()
 
 #Parent directories
-parent_read_file = '/data/datadrive2/AIA_fm_spectra/ts_' + args.loop_location + '/frames(AIA_' + str(args.channel) ').2D_timeseries'
+parent_read_file = '/data/datadrive2/AIA_fm_spectra/ts_' + args.loop_location + '/frames(AIA_' + str(args.channel) + ').2D_timeseries'
 parent_write_dir = '/data/datadrive2/AIA_fm_spectra/solarnmf_ts_analysis/ts_' + args.loop_location + '/' + str(args.channel) + '/'
 
 #Slice timeseries
 N_no_activity = 275
-N_ts = 3 
+N_ts = 3
 ts_cut = []
 ts_parent = np.loadtxt(parent_read_file)
 ts_parent = ts_parent[N_no_activity:-1]
@@ -37,14 +37,15 @@ for i in range(N_ts):
         ts_cut.append(ts_parent[i*delta_ts_parent:(i+1)*delta_ts_parent])
     else:
         ts_cut.append(ts_parent[i*delta_ts_parent:-1])
-    
+
 
 #DEBUG
 plt.plot(ts_parent)
+plt.show()
 fig,ax = plt.subplots(1,N_ts)
-for i in ts_cut:
-    ax[i].plot(i)
-
+for i in range(len(ts_cut)):
+    ax[i].plot(ts_cut[i])
+plt.show()
 
 #Input parameters
 #angle = 45.0
