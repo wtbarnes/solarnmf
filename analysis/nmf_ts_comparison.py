@@ -18,7 +18,7 @@ from solarnmf_learn import SeparateSources
 #Declare function for minimization process
 def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
     #Start minimizer
-    minimizer = SeparateSources(Tmat,q,params)
+    minimizer = SeparateSources(Tmat,q,params,verbose=True)
     u_i,v_i,A_i = minimizer.initialize_uva()
     u,v,A,div = minimizer.minimize_div(u_i,v_i,minimizer.max_i)
     #Save data
