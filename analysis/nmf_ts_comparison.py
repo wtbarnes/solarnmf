@@ -18,7 +18,7 @@ from solarnmf_learn import SeparateSources
 #Declare function for minimization process
 def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
     #Start minimizer
-    minimizer = SeparateSources(Tmat,q,params,verbose=True)
+    minimizer = SeparateSources(Tmat,q,params,verbose=False)
     u_i,v_i,A_i = minimizer.initialize_uva()
     u,v,A,div = minimizer.minimize_div(u_i,v_i,minimizer.max_i)
     #Save data
@@ -63,7 +63,7 @@ logger.write('solarnmf_analysis logger -- channel '+str(args.channel)+'\n')
 logger.write('Starting run at:'+str(datetime.datetime.now())+'\n')
 
 #Set parameters for the minimization
-params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':12,'r':2,'r_iter':10}
+params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':1000,'r':10,'r_iter':10}
 params['lambda_1'] = 0.0001
 params['lambda_2'] = 0.0001
 params['alpha'] = 0.8
