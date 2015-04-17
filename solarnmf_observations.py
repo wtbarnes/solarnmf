@@ -19,8 +19,8 @@ class MakeData(object):
         self.input_type = input_type
 
         self.psi = 1.0e-12
-        self.ngrid_y = 15
-        self.ngrid_x = 15
+        self.ngrid_y = 40
+        self.ngrid_x = 40
         self.noise_level = 0.05
 
         #Check timeseries options

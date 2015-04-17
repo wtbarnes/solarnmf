@@ -15,10 +15,6 @@ from solarnmf_observations import MakeData
 from solarnmf_learn import SeparateSources
 from solarnmf_plotting import MakeBSSPlots
 
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.ndimage.interpolation import rotate
-
 nx = 500
 ny = 500
 p = 15
