@@ -17,17 +17,17 @@ from solarnmf_learn import SeparateSources
 
 #Declare function for minimization process
 def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
+    out_file_prefix = top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)
+    #Open the process log file 
+    logger = open(out_file_prefix+'.log','w')
+    logger.write('worker logger -- channel: '+str(channel)+', cut = '+str(i_cut)+', q = '+str(q)+'\n')
     #Start minimizer
-    minimizer = SeparateSources(Tmat,q,params,verbose=False)
+    minimizer = SeparateSources(Tmat,q,params,verbose=True,logger=logger,print_results=out_file_prefix+'.uva')
     u_i,v_i,A_i = minimizer.initialize_uva()
     u,v,A,div = minimizer.minimize_div(u_i,v_i,minimizer.max_i)
-    #Print log for each iteration 
-    logger = open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.log','w')
-    logger.write('worker logger -- channel: '+str(channel)+', cut = '+str(i_cut)+', q = '+str(q)+'\n')
-    logger.write('div(end) = '+str(div[-1])+', num iterations = '+str(len(div))+'\n')
     logger.close()
     #Save data
-    with open(top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)+'.uva','w') as f:
+    with open(out_file_prefix+'.uva','wb') as f:
         pickle.dump([u,v,A,T,Tmat,div],f)
     f.close()
     
@@ -69,7 +69,7 @@ logger.write('solarnmf_analysis logger -- channel '+str(args.channel)+'\n')
 logger.write('Starting run at:'+str(datetime.datetime.now())+'\n')
 
 #Set parameters for the minimization
-params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':600,'r':10,'r_iter':10}
+params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':500,'r':10,'r_iter':10}
 params['lambda_1'] = 0.0001
 params['lambda_2'] = 0.0001
 params['alpha'] = 0.8

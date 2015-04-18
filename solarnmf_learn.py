@@ -5,6 +5,7 @@
 
 #Import needed modules
 import numpy as np
+import pickle
 from scipy.linalg import toeplitz
 
 class SeparateSources(object):
@@ -38,10 +39,26 @@ class SeparateSources(object):
         else:
             self.verbose = False
             
+        if 'logger' in kwargs:
+            self.logger = kwargs['logger']
+        else:
+            self.logger = False
+            
+        if 'print_results' in kwargs:
+            self.print_results = kwargs['print_results']
+        else:
+            self.print_results = False
+        
+            
         if self.verbose:
-            print "Using ",self.div_measure," divergence measure."
-            print "Using ",self.update_rules," update rules."
-            print "Guessed number of sources ",self.q
+            if self.logger is False:
+                print "Using ",self.div_measure," divergence measure."
+                print "Using ",self.update_rules," update rules."
+                print "Guessed number of sources ",self.q
+            else:
+                self.logger.write("Using "+self.div_measure+" divergence measure.\n")
+                self.logger.write("Using "+self.update_rules+" update rules.\n")
+                self.logger.write("Guessed number of sources "+str(self.q)+"\n")
 
 
     def initialize_uva(self):
@@ -56,8 +73,12 @@ class SeparateSources(object):
         div_current = 1.0e+50
 
         for i in range(self.r):
+            
             if self.verbose:
-                print "Initialization iteration ",i
+                if self.logger is False:
+                    print "Initialization iteration ",i
+                else:
+                    self.logger.write("Initialization iteration "+str(i)+"\n")
 
             u_temp,v_temp,a_temp,div_temp = self.minimize_div(u_temp,v_temp,self.r_iter)
 
@@ -90,9 +111,15 @@ class SeparateSources(object):
             u,v,A = self.update_uva(u,v,i)
 
             div[i] = self.calculate_div(u,v,A,i)
-
-            if self.verbose:
-                print "At iteration ",i," with divergence ",div[i]
+            
+            if i%10 == 0:
+                if self.verbose:
+                    if self.logger is False:
+                        print "At iteration ",i," with divergence ",div[i]
+                    else:
+                        self.logger.write("At iteration "+str(i)+" with divergence "+str(div[i])+"\n")
+                if (self.print_results is not False) and (max_iter > self.r_iter):
+                    self.file_io(u,v,A,div)
 
             delta_div = np.fabs(div[i] - div_old)
             div_old = div[i]
@@ -247,3 +274,10 @@ class SeparateSources(object):
             cv[i] = (self.alpha**i)*self.beta
         
         return np.eye(self.nx) - toeplitz(cv,rv)
+        
+        
+    def file_io(self,u,v,A,div):
+        with open(self.print_results,'wb') as f:
+            pickle.dump([u,v,A,div],f)
+        f.close()
+        
