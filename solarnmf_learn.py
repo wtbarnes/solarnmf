@@ -40,11 +40,12 @@ class SeparateSources(object):
         else:
             self.verbose = False
             
+        self.logger = True
+            
         #if 'logger' in kwargs:
          #   self.logger = kwargs['logger']
         #else:
          #   self.logger = False
-         self.logger = True
             
         if 'print_results' in kwargs:
             self.print_results = kwargs['print_results']
