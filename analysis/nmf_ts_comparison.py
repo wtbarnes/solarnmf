@@ -71,7 +71,7 @@ logger.write('solarnmf_analysis logger -- channel '+str(args.channel)+'\n')
 logger.write('Starting run at:'+str(datetime.datetime.now())+'\n')
 
 #Set parameters for the minimization
-params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':12,'r':2,'r_iter':2}
+params = {'eps':1.0e-4,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':500,'r':10,'r_iter':10}
 params['lambda_1'] = 0.0001
 params['lambda_2'] = 0.0001
 params['alpha'] = 0.8
