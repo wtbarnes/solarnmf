@@ -6,6 +6,7 @@
 #Import needed modules
 import numpy as np
 import pickle
+import logging
 from scipy.linalg import toeplitz
 
 class SeparateSources(object):
@@ -39,10 +40,11 @@ class SeparateSources(object):
         else:
             self.verbose = False
             
-        if 'logger' in kwargs:
-            self.logger = kwargs['logger']
-        else:
-            self.logger = False
+        #if 'logger' in kwargs:
+         #   self.logger = kwargs['logger']
+        #else:
+         #   self.logger = False
+         self.logger = True
             
         if 'print_results' in kwargs:
             self.print_results = kwargs['print_results']
@@ -56,9 +58,9 @@ class SeparateSources(object):
                 print "Using ",self.update_rules," update rules."
                 print "Guessed number of sources ",self.q
             else:
-                self.logger.write("Using "+self.div_measure+" divergence measure.\n")
-                self.logger.write("Using "+self.update_rules+" update rules.\n")
-                self.logger.write("Guessed number of sources "+str(self.q)+"\n")
+                logging.info("Using "+self.div_measure+" divergence measure.\n")
+                logging.info("Using "+self.update_rules+" update rules.\n")
+                logging.info("Guessed number of sources "+str(self.q)+"\n")
 
 
     def initialize_uva(self):
@@ -78,7 +80,7 @@ class SeparateSources(object):
                 if self.logger is False:
                     print "Initialization iteration ",i
                 else:
-                    self.logger.write("Initialization iteration "+str(i)+"\n")
+                    logging.info("Initialization iteration "+str(i)+"\n")
 
             u_temp,v_temp,a_temp,div_temp = self.minimize_div(u_temp,v_temp,self.r_iter)
 
@@ -117,7 +119,7 @@ class SeparateSources(object):
                     if self.logger is False:
                         print "At iteration ",i," with divergence ",div[i]
                     else:
-                        self.logger.write("At iteration "+str(i)+" with divergence "+str(div[i])+"\n")
+                        logging.info("At iteration "+str(i)+" with divergence "+str(div[i])+"\n")
                 if (self.print_results is not False) and (max_iter > self.r_iter):
                     self.file_io(u,v,A,div)
 

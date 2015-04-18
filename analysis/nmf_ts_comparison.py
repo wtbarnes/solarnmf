@@ -7,6 +7,7 @@
 import numpy as np
 import pickle
 import datetime
+import logging
 import sys
 import argparse
 import multiprocessing
@@ -19,13 +20,12 @@ from solarnmf_learn import SeparateSources
 def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
     out_file_prefix = top_dir+'channel'+str(channel)+'_cut'+str(i_cut)+'_q'+str(q)
     #Open the process log file 
-    logger = open(out_file_prefix+'.log','w')
-    logger.write('worker logger -- channel: '+str(channel)+', cut = '+str(i_cut)+', q = '+str(q)+'\n')
+    logging.basicConfig(filename=out_file_prefix+'.log',level=logging.INFO)
+    logging.info('worker logger -- channel: '+str(channel)+', cut = '+str(i_cut)+', q = '+str(q)+'\n')
     #Start minimizer
-    minimizer = SeparateSources(Tmat,q,params,verbose=True,logger=logger,print_results=out_file_prefix+'.uva')
+    minimizer = SeparateSources(Tmat,q,params,verbose=True,print_results=out_file_prefix+'.uva')
     u_i,v_i,A_i = minimizer.initialize_uva()
     u,v,A,div = minimizer.minimize_div(u_i,v_i,minimizer.max_i)
-    logger.close()
     #Save data
     with open(out_file_prefix+'.uva','wb') as f:
         pickle.dump([u,v,A,T,Tmat,div],f)
