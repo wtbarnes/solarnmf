@@ -6,6 +6,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from scipy.ndimage.interpolation import rotate
 
 class MakeBSSPlots(object):
@@ -21,10 +22,11 @@ class MakeBSSPlots(object):
         self.q = self.u.shape[1]
         
         self.fs = 18
-        self.cm = 'hot'
+        self.cm = 'Blues'
         self.print_format = 'eps'
-        self.print_dpi = 1000
-        self.fig_size = (12,10)
+        self.print_dpi = 600
+        self.fig_size = (8,8)
+        self.yaxis_format = FormatStrFormatter('%3.1f')
         
         self.ny = kwargs['ny']
         self.nx = kwargs['nx']
@@ -75,21 +77,30 @@ class MakeBSSPlots(object):
         """Plot original observation and recovered result"""
         if self.input_type == 'matrix':
             fig,ax = plt.subplots(1,2,figsize=self.fig_size)
-            fig.tight_layout()
+            plt.subplots_adjust(left=0.05,right=0.95,top=1.0,bottom=0.0,hspace=0.0,wspace=0.12)
             imT = ax[0].imshow(self.T,cmap=self.cm)
             imA = ax[1].imshow(self.A,cmap=self.cm)
             ax[0].set_title(r'$T$, Observation',fontsize=self.fs)
             ax[1].set_title(r'$A$, Prediction',fontsize=self.fs)
-            fig.colorbar(imT,cax=make_axes_locatable(ax[0]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)])
-            fig.colorbar(imA,cax=make_axes_locatable(ax[1]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.A),(np.max(self.A)-np.min(self.A))/2.0,np.max(self.A)])
+            ax[0].set_yticks([])
+            ax[0].set_xticks([])
+            ax[1].set_yticks([])
+            ax[1].set_xticks([])
+            cbar1 = fig.colorbar(imT,cax=make_axes_locatable(ax[0]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)],format=self.yaxis_format)
+            cbar2 = fig.colorbar(imA,cax=make_axes_locatable(ax[1]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.A),(np.max(self.A)-np.min(self.A))/2.0,np.max(self.A)],format=self.yaxis_format)
 
         elif self.input_type == 'timeseries':
             fig = plt.figure(figsize=self.fig_size)
             ax = fig.gca()
+            plt.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.07,hspace=0.05)
             ax.plot(self.T,'.k',label='Observation')
             ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
-            ax.set_title('Composite Time Series Comparison',fontsize=self.fs)
-            ax.legend(loc=2)
+            ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
+            ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
+            ax.set_title('Composite Comparison',fontsize=self.fs)
+            ax.set_yticks([np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)])
+            ax.yaxis.set_major_formatter(self.yaxis_format)
+            ax.legend(loc=1)
 
         else:
             raise ValueError("Invalid input type option.")
@@ -112,44 +123,50 @@ class MakeBSSPlots(object):
             
             
         if self.input_type == 'matrix':
-            fig,ax = plt.subplots(rows,2,figsize=self.fig_size)
-            fig.tight_layout()
-            ax[0,0].set_title(r'Sources',fontsize=self.fs)
-            ax[0,1].set_title(r'Predictions',fontsize=self.fs)
+            fig,ax = plt.subplots(2,rows,figsize=self.fig_size)
+            plt.subplots_adjust(left=0.05,right=0.98,top=1.0,bottom=0.0,hspace=0.0,wspace=0.1)
+            ax[0,0].set_ylabel(r'Sources',fontsize=self.fs)
+            ax[1,0].set_ylabel(r'Predictions',fontsize=self.fs)
             for i in range(rows):
                 try:
-                    im = ax[i,0].imshow(self.target[pairs[i][0]],cmap=self.cm)
-                    ax[i,0].xaxis.set_ticklabels([])
-                    ax[i,0].yaxis.set_ticklabels([])
-                    fig.colorbar(im,cax=make_axes_locatable(ax[i,0]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.target[i]),(np.max(self.target[i])-np.min(self.target[i]))/2.0,np.max(self.target[i])])
+                    im = ax[0,i].imshow(self.target[pairs[i][0]],cmap=self.cm)
+                    ax[0,i].set_yticks([])
+                    ax[0,i].set_xticks([])
+                    #fig.colorbar(im,cax=make_axes_locatable(ax[0,i]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.target[i]),(np.max(self.target[i])-np.min(self.target[i]))/2.0,np.max(self.target[i])],format=self.yaxis_format)
                 except:
                     pass
                 try:
-                    im = ax[i,1].imshow(self.components[pairs[i][1]],cmap=self.cm)
-                    ax[i,1].xaxis.set_ticklabels([])
-                    ax[i,1].yaxis.set_ticklabels([])
-                    fig.colorbar(im,cax=make_axes_locatable(ax[i,1]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.components[i]),(np.max(self.components[i])-np.min(self.components[i]))/2.0,np.max(self.components[i])])
+                    im = ax[1,i].imshow(self.components[pairs[i][1]],cmap=self.cm)
+                    ax[1,i].set_yticks([])
+                    ax[1,i].set_xticks([])
+                    #fig.colorbar(im,cax=make_axes_locatable(ax[1,i]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.components[i]),(np.max(self.components[i])-np.min(self.components[i]))/2.0,np.max(self.components[i])],format=self.yaxis_format)
                 except:
                     pass
                                 
         elif self.input_type == 'timeseries':
             fig,ax = plt.subplots(rows,1,figsize=self.fig_size)
-            fig.tight_layout()
-            ax[0].set_title(r'Sources Reconstruction',fontsize=self.fs)
+            plt.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.07,hspace=0.05)
+            ax[0].set_title(r'Source Reconstruction',fontsize=self.fs)
             for i in range(rows):
-                ax[i].set_ylabel(r'$I$ (arb. units)',fontsize=self.fs)
+                if i == int(rows/2.0):
+                    ax[i].set_ylabel(r'$I$ (au)',fontsize=self.fs)
                 try:
                     ax[i].plot(self.target[pairs[i][0]],'.k',label='source')
                 except:
                     pass
                 try:
                     ax[i].plot(self.components[pairs[i][1]][self.ts_cut,:],'r',label='prediction')
+                    ax[i].set_yticks([0.0,(np.max(self.components[pairs[i][1]][self.ts_cut,:]) - np.min(self.components[pairs[i][1]][self.ts_cut,:]))/2.0,np.max(self.components[pairs[i][1]][self.ts_cut,:])])
+                    ax[i].yaxis.set_major_formatter(self.yaxis_format)
+                    ax[i].set_ylim([0,1])
                 except:
                     pass
                 if i == rows-1:
-                    ax[i].set_xlabel(r'$t$ (arb. units)',fontsize=self.fs)
+                    ax[i].set_xlabel(r'$t$ (au)',fontsize=self.fs)
+                else:
+                    ax[i].xaxis.set_ticklabels([])
 
-            ax[0].legend(loc=2)
+            ax[0].legend(loc=1)
 
         else:
             raise ValueError("Invalid input type option")
@@ -167,6 +184,7 @@ class MakeBSSPlots(object):
         ax.plot(self.div)
         ax.set_yscale('log')
         ax.set_xlim([0,len(self.div)])
+        ax.set_ylim([np.min(self.div),np.max(self.div)])
         ax.set_title(r'Divergence Measure',fontsize=self.fs)
         ax.set_xlabel(r'iteration',fontsize=self.fs)
         ax.set_ylabel(r'$d(T,A)$',fontsize=self.fs)
