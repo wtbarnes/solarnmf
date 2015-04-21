@@ -115,6 +115,7 @@ class MakeBSSPlots(object):
 
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.close('all')
         else:
             plt.show()
 
@@ -181,6 +182,7 @@ class MakeBSSPlots(object):
 
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.close('all')
         else:
             plt.show()
             
@@ -205,6 +207,7 @@ class MakeBSSPlots(object):
         
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.close('all')
         else:
             plt.show()
 
@@ -223,6 +226,7 @@ class MakeBSSPlots(object):
 
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.close('all')
         else:
             plt.show()
             
