@@ -35,7 +35,7 @@ q = np.arange(args.p_lower,args.p_upper+1,1)
 for i in range(args.n_cuts):
     for j in range(len(q)):
         #Read in the data
-        try:
+        #try:
             with open(parent_dir+fn+'.uva'%(i,q[j]),'rb') as f:
                 u,v,A,T,Tmat,div = pickle.load(f)
             #Print status
@@ -43,6 +43,6 @@ for i in range(args.n_cuts):
             #Declare instance and plot
             plotter = MakeBSSPlots(data_option,input_type,u,v,A,T,div,Tmat=Tmat,angle=angle,ny=T.shape[0],nx=T.shape[0])
             plotter.plot_obs_pred_total_sources_ts(print_fig_filename=parent_dir+'plots/'+fn+'.eps'%(i,q[j]))
-        except:
-            print "Cannot build plot. Incomplete data set."
-            continue
+        #except:
+            #print "Cannot build plot. Incomplete data set."
+            #continue
