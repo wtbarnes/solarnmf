@@ -23,44 +23,65 @@ args = parser.parse_args()
 
 #Define range of possible source guesses
 q = np.arange(args.p_lower,args.p_upper+1,1)
-eps = 10.0
+eps = 0.1
 fs = 18.0
 def get_color(i):
-    r = float(i)/float(len(q))
-    return [r,r/2.0,r/3.0]
+    #np.random.seed()
+    #r = float(i)/float(args.n_cuts)
+    if i == 0:
+        color = 'black'
+    elif i == 1:
+        color = 'blue'
+    else:
+        color = 'red'
+    return color #np.random.rand(3)#[r,r/2.0,r/3.0]
 
 #Define parent directory
 parent_dir = '/data/datadrive2/AIA_fm_spectra/solarnmf_ts_analysis/ts_'+args.loop_location+'/'+str(args.channel)+'/'
 fn = 'channel'+str(args.channel)+'_cut%d_q%d.uva'
 
 #Begin loop over number of guesses and cuts
+q_list = []
 div_per_q = []
 for i in range(args.n_cuts):
     temp_div = []
+    temp_q = []
     for j in range(len(q)):
+	print "Processing cut %d, q=%d"%(i,q[j])
         try:
             with open(parent_dir+fn%(i,q[j]),'rb') as f:
                 u,v,A,T,Tmat,div = pickle.load(f)
         except:
-            print "Loading incomplete data set for q = %d, cut = %d"%(q[j],i)
-            with open(parent_dir+fn%(i,q[j]),'rb') as f:
-                u,v,A,div = pickle.load(f)
+	    try:
+            	print "Loading incomplete data set for q = %d, cut = %d"%(q[j],i)
+            	with open(parent_dir+fn%(i,q[j]),'rb') as f:
+                	u,v,A,div = pickle.load(f)
+	    except:
+		print "Unable to unpickle file."
+		pass
                 
-        div_diff = np.where(np.fabs(np.diff(div))<eps)
-        temp_div.append(np.mean(div[div_diff[0]:div_diff[-1]+1]))
+	div_diff = np.where(np.fabs(np.diff(div))<eps)[0]
+        temp_div.append(np.mean(div[div_diff[0]:(div_diff[-1]+1)]))
+	temp_q.append(q[j])
     
     div_per_q.append(temp_div)
+    q_list.append(temp_q)
     
 
 #Plot divergence as a function of guessed sources for all cuts
-lines = 0
 fig = plt.figure(figsize=(8,8))
 ax = fig.gca()
 ax.set_title(r'SDO/AIA '+str(args.channel)+r' $\AA$, '+args.loop_location,fontsize=fs)
 for i in range(args.n_cuts):
-    lines += ax.plot(div_per_q,color=get_color(i),label=r'Cute '+str(i))
+    if i == 0:
+        lines = ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
+    else:
+        lines += ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
 ax.set_ylabel(r'$d/d_{min}$',fontsize=fs)
 ax.set_xlabel(r'$q$',fontsize=fs)
+ax.set_ylim([.5,np.max(div_per_q)])
+ax.set_xlim([args.p_lower-int(args.p_lower/10),args.p_upper+int(args.p_upper/10.0)])
+ax.set_yscale('log')
 labels = [l.get_label() for l in lines]
 ax.legend(lines,labels,loc=1)
 plt.show()
