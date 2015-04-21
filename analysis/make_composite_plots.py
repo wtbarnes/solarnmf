@@ -36,7 +36,7 @@ for i in range(args.n_cuts):
     for j in range(len(q)):
         #Read in the data
         #try:
-            with open(parent_dir+fn+'.uva'%(i,q[j]),'rb') as f:
+            with open(parent_dir+fn%(i,q[j])+'.uva','rb') as f:
                 u,v,A,T,Tmat,div = pickle.load(f)
             #Print status
             print "Building plots for cut %d, q=%d"%(i,q[j]) 
