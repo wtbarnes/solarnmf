@@ -52,13 +52,13 @@ for i in range(args.n_cuts):
             with open(parent_dir+fn%(i,q[j]),'rb') as f:
                 u,v,A,T,Tmat,div = pickle.load(f)
         except:
-	    try:
+    	    try:
             	print "Loading incomplete data set for q = %d, cut = %d"%(q[j],i)
             	with open(parent_dir+fn%(i,q[j]),'rb') as f:
                 	u,v,A,div = pickle.load(f)
-	    except:
-		print "Unable to unpickle file."
-		pass
+    	    except:
+        		print "Unable to unpickle file."
+        		pass
                 
 	div_diff = np.where(np.fabs(np.diff(div))<eps)[0]
         temp_div.append(np.mean(div[div_diff[0]:(div_diff[-1]+1)]))

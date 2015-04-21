@@ -8,7 +8,7 @@ import sys
 import pickle
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
+
 sys.path.append('../')
 from solarnmf_plotting import MakeBSSPlots
 
