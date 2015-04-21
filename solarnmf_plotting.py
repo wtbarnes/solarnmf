@@ -19,12 +19,18 @@ class MakeBSSPlots(object):
         self.A = A
         self.T = T
         self.div = div
-        self.q = self.u.shape[1]
+        if 'q' not in kwargs:
+            self.q = self.u.shape[1]
+        else:
+            self.q = kwargs['q']
         
         self.fs = 18
         self.cm = 'Blues'
         self.print_format = 'eps'
-        self.print_dpi = 600
+        if 'dpi' not in kwargs:
+            self.print_dpi = 1000
+        else:
+            self.print_dpi = kwargs['dpi']
         self.fig_size = (8,8)
         self.yaxis_format = FormatStrFormatter('%3.1f')
         
@@ -171,6 +177,30 @@ class MakeBSSPlots(object):
         else:
             raise ValueError("Invalid input type option")
 
+        if 'print_fig_filename' in kwargs:
+            plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+        else:
+            plt.show()
+            
+            
+    def plot_obs_pred_total_sources_ts(self,**kwargs):
+        """Plot sources + total for observation and prediction"""
+        
+        fig = plt.figure(figsize=self.fig_size)
+        ax = fig.gca()
+        plt.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.07,hspace=0.05)
+        ax.plot(self.T,'.k',label='Observation')
+        ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
+        for i in range(self.q):
+            ax.plot(self.components[i][self.ts_cut,:],'--b')
+        ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
+        ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
+        ax.set_title('Composite Comparison',fontsize=self.fs)
+        ax.set_yticks([np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)])
+        ax.yaxis.set_major_formatter(self.yaxis_format)
+        ax.set_ylim([0,1])
+        ax.legend(loc=1)
+        
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
         else:
