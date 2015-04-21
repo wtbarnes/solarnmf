@@ -39,11 +39,11 @@ for i in range(args.n_cuts):
     temp_div = []
     for j in range(len(q)):
         try:
-            with open(fn%(i,q[j]),'rb') as f:
+            with open(parent_dir+fn%(i,q[j]),'rb') as f:
                 u,v,A,T,Tmat,div = pickle.load(f)
         except:
             print "Loading incomplete data set for q = %d, cut = %d"%(q[j],i)
-            with open(fn%(i,q[j]),'rb') as f:
+            with open(parent_dir+fn%(i,q[j]),'rb') as f:
                 u,v,A,div = pickle.load(f)
                 
         div_diff = np.where(np.fabs(np.diff(div))<eps)
