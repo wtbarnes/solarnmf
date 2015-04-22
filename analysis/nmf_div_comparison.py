@@ -47,7 +47,7 @@ for i in range(args.n_cuts):
     temp_div = []
     temp_q = []
     for j in range(len(q)):
-	print "Processing cut %d, q=%d"%(i,q[j])
+	    print "Processing cut %d, q=%d"%(i,q[j])
         try:
             with open(parent_dir+fn%(i,q[j]),'rb') as f:
                 u,v,A,T,Tmat,div = pickle.load(f)
@@ -60,9 +60,10 @@ for i in range(args.n_cuts):
         		print "Unable to unpickle file."
         		pass
                 
-	div_diff = np.where(np.fabs(np.diff(div))<eps)[0]
-        temp_div.append(np.mean(div[div_diff[0]:(div_diff[-1]+1)]))
-	temp_q.append(q[j])
+	    #div_diff = np.where(np.fabs(np.diff(div))<eps)[0]
+        #temp_div.append(np.mean(div[div_diff[0]:(div_diff[-1]+1)]))
+	    temp_div.append(div[-1])
+        temp_q.append(q[j])
     
     div_per_q.append(temp_div)
     q_list.append(temp_q)
