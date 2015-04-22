@@ -47,23 +47,23 @@ for i in range(args.n_cuts):
     temp_div = []
     temp_q = []
     for j in range(len(q)):
-	print "Processing cut %d, q=%d"%(i,q[j])
+        print "Processing cut %d, q=%d"%(i,q[j])
         try:
             with open(parent_dir+fn%(i,q[j]),'rb') as f:
                 u,v,A,T,Tmat,div = pickle.load(f)
-        except:
-    	    try:
-            	print "Loading incomplete data set for q = %d, cut = %d"%(q[j],i)
-            	with open(parent_dir+fn%(i,q[j]),'rb') as f:
-                	u,v,A,div = pickle.load(f)
-    	    except:
-        		print "Unable to unpickle file."
-        		pass
+            except:
+    	        try:
+            	    print "Loading incomplete data set for q = %d, cut = %d"%(q[j],i)
+            	    with open(parent_dir+fn%(i,q[j]),'rb') as f:
+                	    u,v,A,div = pickle.load(f)
+    	        except:
+        		    print "Unable to unpickle file."
+        		    continue
                 
-	#div_diff = np.where(np.fabs(np.diff(div))<eps)[0]
+        #div_diff = np.where(np.fabs(np.diff(div))<eps)[0]
         #temp_div.append(np.mean(div[div_diff[0]:(div_diff[-1]+1)]))
-	temp_div.append(div[-1])
-       	temp_q.append(q[j])
+        temp_div.append(div[-1])
+        temp_q.append(q[j])
     
     div_per_q.append(temp_div)
     q_list.append(temp_q)
@@ -81,8 +81,8 @@ for i in range(args.n_cuts):
         lines += ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
 ax.set_ylabel(r'$d/d_{min}$',fontsize=fs)
 ax.set_xlabel(r'$q$',fontsize=fs)
-ax.set_ylim([.5,10])
+ax.set_ylim([.9,np.max(np.max(div_per_q))])
 ax.set_xlim([args.p_lower-int(args.p_lower/10),args.p_upper+int(args.p_upper/10.0)])
 labels = [l.get_label() for l in lines]
-ax.legend(lines,labels,loc=2)
+ax.legend(lines,labels,loc=1)
 plt.show()
