@@ -189,7 +189,10 @@ class MakeBSSPlots(object):
             
     def plot_obs_pred_total_sources_ts(self,**kwargs):
         """Plot sources + total for observation and prediction"""
-        
+        if 'title' in kwargs:
+            plot_title = kwargs['title']
+        else:
+            plot_title = 'Composite Comparison'
         fig = plt.figure(figsize=self.fig_size)
         ax = fig.gca()
         plt.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.07,hspace=0.05)
@@ -199,7 +202,7 @@ class MakeBSSPlots(object):
             ax.plot(self.components[i][self.ts_cut,:],'--b')
         ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
         ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
-        ax.set_title('Composite Comparison',fontsize=self.fs)
+        ax.set_title(plot_title,fontsize=self.fs)
         ax.set_yticks([np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)])
         ax.yaxis.set_major_formatter(self.yaxis_format)
         ax.set_ylim([0,1])

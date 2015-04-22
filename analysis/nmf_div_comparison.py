@@ -80,7 +80,7 @@ for i in range(args.n_cuts):
     else:
         lines += ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
 ax.set_ylabel(r'$d/d_{min}$',fontsize=fs)
-ax.set_xlabel(r'$q$',fontsize=fs)
+ax.set_xlabel(r'$k$',fontsize=fs)
 ax.set_ylim([.9,np.max(np.max(div_per_q))])
 ax.set_xlim([args.p_lower-int(args.p_lower/10),args.p_upper+int(args.p_upper/10.0)])
 labels = [l.get_label() for l in lines]

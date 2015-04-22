@@ -42,7 +42,7 @@ for i in range(args.n_cuts):
             print "Building plots for cut %d, q=%d"%(i,q[j]) 
             #Declare instance and plot
             plotter = MakeBSSPlots(data_option,input_type,u,v,A,T,div,Tmat=Tmat,angle=angle,ny=T.shape[0],nx=T.shape[0])
-            plotter.plot_obs_pred_total_sources_ts(print_fig_filename=parent_dir+'plots/'+fn%(i,q[j])+'.eps')
+            plotter.plot_obs_pred_total_sources_ts(print_fig_filename=parent_dir+'plots/'+fn%(i,q[j])+'.eps',title=r'SDO/AIA %d $\AA$ cut %d, $k$=%d'%(args.channel,i,q[j]))
         except:
             print "Cannot build plot. Incomplete data set."
             continue
