@@ -85,9 +85,9 @@ for i in range(args.n_cuts):
         lines = ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
     else:
         lines += ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
-    pars,covar = curve_fit(exponential_fit,np.array(q_list[i]),np.array(div_per_q[i]/np.min(div_per_q[i])))
+    pars,covar = curve_fit(exponential_fit,np.array(q_list[i]),np.array(div_per_q[i]))
     fit_params.append((pars,covar))
-    ax.plot(np.array(q_list[i]),exponential_fit(np.array(q_list[i]),*pars),'--',color=get_color(i))  
+    ax.plot(np.array(q_list[i]),exponential_fit(np.array(q_list[i]),*pars)/np.min(div_per_q[i]),'--',color=get_color(i))  
 ax.set_ylabel(r'$d/d_{min}$',fontsize=fs)
 ax.set_xlabel(r'$k$',fontsize=fs)
 ax.set_ylim([.9,5])
@@ -95,7 +95,7 @@ ax.set_xlim([args.p_lower-int(args.p_lower/10),args.p_upper+int(args.p_upper/10.
 for i in range(args.n_cuts):
     sigma = np.diag(fit_params[i][1])
     tau = fit_params[i][0][1]
-    fig.figtext(.7,.7-0.05*i,r'$\tau_k$=%3.1f $\pm$ %3.1f'%(tau,sigma[1]),fontsize=18.0,color=get_color(i))
+    ax.text(35,4.0-0.3*i,r'$\tau_k$=%3.1f $\pm$ %3.1f'%(tau,sigma[1]),fontsize=18.0,color=get_color(i))
 labels = [l.get_label() for l in lines]
 ax.legend(lines,labels,loc=1)
 plt.show()
