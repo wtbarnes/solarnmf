@@ -13,7 +13,7 @@ time_total = 10800.0
 header_lines = 4
 
 #Specify paths and file naming formats
-parent_dir = '/data/datadrive2/AIA_fm_spectra/solarnmf_ts_analysis/heating_profiles_aia_spectra/'
+parent_dir = '/data/datadrive2/AIA_fm_spectra/heating_profiles_aia_spectra/'
 fn = 'heating_file_L%d.cfg'
 
 #Initialize list of field lines
@@ -46,18 +46,22 @@ for i in range(N_fl):
     field_lines.append(events)
     #Close the file
     f.close()
-    
-    
+
+
 #Do some statistics on heating events per field line
 events_per_line = []
 mean_frequency_per_line = []
-[(events_per_line.append(len[i]),mean_frequency_per_line.append(float(len(i))/time_total)) for i in field_lines]
+for i in field_lines:
+    events_per_line.append(len(i))
+    mean_frequency_per_line.append(float(len(i))/time_total)
+
+#Statistics for delays between heating events
+
 
 #Plot histogram of events per line
-plt.hist(events_per_line,bins=20)
+plt.hist(events_per_line,bins=40)
 plt.show()
 
 #Plot histogram of mean frequency per line
-plt.hist(mean_frequency_per_line,bins=20)
+plt.hist(mean_frequency_per_line,bins=40)
 plt.show()
-
