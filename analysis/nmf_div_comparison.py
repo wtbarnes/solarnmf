@@ -95,7 +95,7 @@ ax.set_xlim([args.p_lower-int(args.p_lower/10),args.p_upper+int(args.p_upper/10.
 for i in range(args.n_cuts):
     sigma = np.diag(fit_params[i][1])
     tau = fit_params[i][0][1]
-    ax.text(.7,.7-0.05*i,r'$\tau_k$=%3.1f $\pm$ %3.1f'%(tau,sigma[1]),fontsize=18.0,color=get_color(i))
+    fig.figtext(.7,.7-0.05*i,r'$\tau_k$=%3.1f $\pm$ %3.1f'%(tau,sigma[1]),fontsize=18.0,color=get_color(i))
 labels = [l.get_label() for l in lines]
 ax.legend(lines,labels,loc=1)
 plt.show()
