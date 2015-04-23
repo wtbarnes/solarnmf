@@ -78,6 +78,7 @@ def exponential_fit(x,a,b):
 #Plot divergence as a function of guessed sources for all cuts
 fig = plt.figure(figsize=(8,8))
 ax = fig.gca()
+plt.subplots_adjust(left=.1,right=.97,top=.95,bottom=.08)
 #ax.set_yscale('log')
 ax.set_title(r'SDO/AIA '+str(args.channel)+r' $\AA$, '+args.loop_location,fontsize=fs)
 for i in range(args.n_cuts):
@@ -98,4 +99,5 @@ for i in range(args.n_cuts):
     ax.text(35,3.0-0.25*i,r'$\tau_k$ = %3.1f $\pm$ %3.1f'%(tau,sigma[1]),fontsize=18.0,color=get_color(i))
 labels = [l.get_label() for l in lines]
 ax.legend(lines,labels,loc=1)
+#plt.show()
 plt.savefig('/home/wtb2/Documents/solarnmf/poster/figures/nmf_div_comp_'+str(args.channel)+'.eps',format='eps',dpi=1000)
