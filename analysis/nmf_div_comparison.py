@@ -8,6 +8,7 @@ import sys
 import pickle
 import argparse
 import numpy as np
+from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 sys.path.append('../')
 from solarnmf_plotting import MakeBSSPlots
@@ -69,6 +70,11 @@ for i in range(args.n_cuts):
     q_list.append(temp_q)
     
 
+#Exponential fit to our curve
+fit_params = []
+def exponential_fit(x,a,b):
+    return a*np.exp(-b*x)
+
 #Plot divergence as a function of guessed sources for all cuts
 fig = plt.figure(figsize=(8,8))
 ax = fig.gca()
@@ -79,6 +85,9 @@ for i in range(args.n_cuts):
         lines = ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
     else:
         lines += ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
+    pars,covar = curve_fit(exponential_fit,q_list[i],div_per_q[i]/np.min(div_per_q[i]))
+    fit_params.append((pars,covar))
+    ax.plot(q_list[i],exponential_fit(q_list[i],*pars),'--',color=get_color(i))  
 ax.set_ylabel(r'$d/d_{min}$',fontsize=fs)
 ax.set_xlabel(r'$k$',fontsize=fs)
 ax.set_ylim([.9,np.max(np.max(div_per_q))])
