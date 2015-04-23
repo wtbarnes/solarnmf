@@ -85,9 +85,9 @@ for i in range(args.n_cuts):
         lines = ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
     else:
         lines += ax.plot(q_list[i],div_per_q[i]/np.min(div_per_q[i]),'o',color=get_color(i),label=r'Cut '+str(i))
-    pars,covar = curve_fit(exponential_fit,q_list[i],div_per_q[i]/np.min(div_per_q[i]))
+    pars,covar = curve_fit(exponential_fit,np.array(q_list[i]),np.array(div_per_q[i]/np.min(div_per_q[i])))
     fit_params.append((pars,covar))
-    ax.plot(q_list[i],exponential_fit(q_list[i],*pars),'--',color=get_color(i))  
+    ax.plot(np.array(q_list[i]),exponential_fit(np.array(q_list[i]),*pars),'--',color=get_color(i))  
 ax.set_ylabel(r'$d/d_{min}$',fontsize=fs)
 ax.set_xlabel(r'$k$',fontsize=fs)
 ax.set_ylim([.9,np.max(np.max(div_per_q))])
