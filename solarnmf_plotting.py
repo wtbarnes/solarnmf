@@ -203,10 +203,10 @@ class MakeBSSPlots(object):
         ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
         ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
         ax.set_title(plot_title,fontsize=self.fs)
-        ax.set_yticks([np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)])
         ax.yaxis.set_major_formatter(self.yaxis_format)
         ax.set_ylim([0,1])
-        ax.legend(loc=1)
+        ax.set_xlim([0,len(self.T)])
+        ax.legend(loc=2)
         
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
