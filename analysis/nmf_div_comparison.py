@@ -73,7 +73,7 @@ for i in range(args.n_cuts):
 #Exponential fit to our curve
 fit_params = []
 def exponential_fit(x,a,b):
-    return a*np.exp(-b*x)
+    return a*np.exp(-x/b)
 
 #Plot divergence as a function of guessed sources for all cuts
 fig = plt.figure(figsize=(8,8))
