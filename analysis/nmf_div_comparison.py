@@ -90,12 +90,12 @@ for i in range(args.n_cuts):
     ax.plot(np.array(q_list[i]),exponential_fit(np.array(q_list[i]),*pars)/np.min(div_per_q[i]),'--',color=get_color(i))  
 ax.set_ylabel(r'$d/d_{min}$',fontsize=fs)
 ax.set_xlabel(r'$k$',fontsize=fs)
-ax.set_ylim([.9,5])
+ax.set_ylim([.9,4])
 ax.set_xlim([args.p_lower-int(args.p_lower/10),args.p_upper+int(args.p_upper/10.0)])
 for i in range(args.n_cuts):
     sigma = np.diag(fit_params[i][1])
     tau = fit_params[i][0][1]
-    ax.text(35,4.0-0.3*i,r'$\tau_k$ = %3.1f $\pm$ %3.1f'%(tau,sigma[1]),fontsize=18.0,color=get_color(i))
+    ax.text(35,3.0-0.25*i,r'$\tau_k$ = %3.1f $\pm$ %3.1f'%(tau,sigma[1]),fontsize=18.0,color=get_color(i))
 labels = [l.get_label() for l in lines]
 ax.legend(lines,labels,loc=1)
-plt.show()
+plt.savefig('/home/wtb2/Documents/solarnmf/poster/figures/nmf_div_comp_'+str(args.channel)+'.eps',format='eps',dpi=1000)
