@@ -32,7 +32,7 @@ def minimizer_worker(Tmat,T,q,params,i_cut,top_dir,channel):
     with open(out_file_prefix+'.uva','wb') as f:
         pickle.dump([u,v,A,T,Tmat,div],f)
     f.close()
-    
+
 
 #Parse command line arguments
 parser = argparse.ArgumentParser(description='Run NMF method for specific channel over multiple cuts for range of source guesses')
@@ -71,7 +71,7 @@ logger.write('solarnmf_analysis logger -- channel '+str(args.channel)+'\n')
 logger.write('Starting run at:'+str(datetime.datetime.now())+'\n')
 
 #Set parameters for the minimization
-params = {'eps':1.0e-3,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':150,'r':10,'r_iter':10}
+params = {'eps':1.0e-3,'psi':1.0e-16,'sparse_u':0.125,'sparse_v':0.125,'reg_0':20.0,'reg_tau':50.0,'max_i':150,'r':10,'r_iter':5}
 params['lambda_1'] = 0.0001
 params['lambda_2'] = 0.0001
 params['alpha'] = 0.8
@@ -84,17 +84,17 @@ for i in range(N_ts):
     #Declare instance of MakeData class to format input
     data = MakeData('data','timeseries',file=ts_cut[i],angle=angle)
     T,Tmat = data.make_t_matrix()
-    
+
     #Write to the logger
     logger.write('Starting runs for cut '+str(i)+' at '+str(datetime.datetime.now())+'\n')
-    
+
     for j in range(N_q):
         #Write to log file
         logger.write('Running minimizer for q = '+str(q[j])+' for cut '+str(i)+'\n')
         #Start process
         mtp = multiprocessing.Process(target=minimizer_worker,args=(Tmat,T,q[j],params,i,parent_write_dir,args.channel))
         mtp.start()
-        
+
 
 #Close the logger
 logger.close()
