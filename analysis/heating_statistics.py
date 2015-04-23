@@ -56,7 +56,10 @@ for i in field_lines:
     mean_frequency_per_line.append(float(len(i))/time_total)
 
 #Statistics for delays between heating events
-
+delta_t = []
+for i in field_lines:
+    for j in range(1,len(i)):
+        delta_t.append(i[j][3] - i[j-1][6])
 
 #Plot histogram of events per line
 plt.hist(events_per_line,bins=40)
@@ -64,4 +67,8 @@ plt.show()
 
 #Plot histogram of mean frequency per line
 plt.hist(mean_frequency_per_line,bins=40)
+plt.show()
+
+#Plot histogram of delay times for all field lines and all events
+plt.hist(delta_t,bins=40)
 plt.show()
