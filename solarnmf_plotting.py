@@ -28,7 +28,10 @@ class MakeBSSPlots(object):
         
         self.fs = 18
         self.cm = 'Blues'
-        self.print_format = 'eps'
+        if 'print_format' not in kwargs:
+            self.print_format = 'eps'
+        else:
+            self.print_format = kwargs['print_format']
         if 'dpi' not in kwargs:
             self.print_dpi = 1000
         else:
@@ -114,7 +117,7 @@ class MakeBSSPlots(object):
             raise ValueError("Invalid input type option.")
 
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.print_format,format=self.print_format,dpi=self.print_dpi)
             plt.close('all')
         else:
             plt.show()
@@ -181,7 +184,7 @@ class MakeBSSPlots(object):
             raise ValueError("Invalid input type option")
 
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.print_format,format=self.print_format,dpi=self.print_dpi)
             plt.close('all')
         else:
             plt.show()
@@ -209,7 +212,7 @@ class MakeBSSPlots(object):
         ax.legend(loc=2)
         
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.print_format,format=self.print_format,dpi=self.print_dpi)
             plt.close('all')
         else:
             plt.show()
@@ -228,7 +231,7 @@ class MakeBSSPlots(object):
         ax.set_ylabel(r'$d(T,A)$',fontsize=self.fs)
 
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.print_format,dpi=self.print_dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.print_format,format=self.print_format,dpi=self.print_dpi)
             plt.close('all')
         else:
             plt.show()
