@@ -28,6 +28,7 @@ class MakeBSSPlots(object):
         
         self.fs = 18
         self.cm = 'Blues'
+        self.zero_tol = 1.e-5
         if 'print_format' not in kwargs:
             self.print_format = 'eps'
         else:
@@ -89,8 +90,8 @@ class MakeBSSPlots(object):
         if self.input_type == 'matrix':
             fig,ax = plt.subplots(1,2,figsize=self.fig_size)
             plt.subplots_adjust(left=0.05,right=0.95,top=1.0,bottom=0.0,hspace=0.0,wspace=0.12)
-            imT = ax[0].imshow(self.T,cmap=self.cm)
-            imA = ax[1].imshow(self.A,cmap=self.cm)
+            imT = ax[0].imshow(np.ma.masked_where(self.T<self.zero_tol*np.max(self.T),self.T),cmap=self.cm)
+            imA = ax[1].imshow(np.ma.masked_where(self.A<self.zero_tol*np.max(self.A),self.A),cmap=self.cm)
             ax[0].set_title(r'$T$, Observation',fontsize=self.fs)
             ax[1].set_title(r'$A$, Prediction',fontsize=self.fs)
             ax[0].set_yticks([])
@@ -141,14 +142,16 @@ class MakeBSSPlots(object):
             ax[1,0].set_ylabel(r'Predictions',fontsize=self.fs)
             for i in range(rows):
                 try:
-                    im = ax[0,i].imshow(self.target[pairs[i][0]],cmap=self.cm)
+                    tmp_mask = np.ma.masked_where(self.target[pairs[i][0]]<self.zero_tol*np.max(self.target[pairs[i][0]]),self.target[pairs[i][0]])
+                    im = ax[0,i].imshow(tmp_mask,cmap=self.cm)
                     ax[0,i].set_yticks([])
                     ax[0,i].set_xticks([])
                     #fig.colorbar(im,cax=make_axes_locatable(ax[0,i]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.target[i]),(np.max(self.target[i])-np.min(self.target[i]))/2.0,np.max(self.target[i])],format=self.yaxis_format)
                 except:
                     pass
                 try:
-                    im = ax[1,i].imshow(self.components[pairs[i][1]],cmap=self.cm)
+                    tmp_mask = np.ma.masked_where(self.target[pairs[i][1]]<self.zero_tol*np.max(self.target[pairs[i][1]]),self.target[pairs[i][1]])
+                    im = ax[1,i].imshow(tmp_mask,cmap=self.cm)
                     ax[1,i].set_yticks([])
                     ax[1,i].set_xticks([])
                     #fig.colorbar(im,cax=make_axes_locatable(ax[1,i]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.components[i]),(np.max(self.components[i])-np.min(self.components[i]))/2.0,np.max(self.components[i])],format=self.yaxis_format)
