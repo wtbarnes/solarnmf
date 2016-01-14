@@ -4,14 +4,13 @@
 #20 April 2015
 
 #Import needed modules
-import sys
 import pickle
 import argparse
 import numpy as np
 from scipy.optimize import curve_fit
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-sys.path.append('../')
-from solarnmf_plotting import MakeBSSPlots
 
 #Parse command line arguments
 parser = argparse.ArgumentParser(description='Run NMF method for specific channel over multiple cuts for range of source guesses')
@@ -79,7 +78,6 @@ def exponential_fit(x,a,b):
 fig = plt.figure(figsize=(8,8))
 ax = fig.gca()
 plt.subplots_adjust(left=.1,right=.97,top=.95,bottom=.08)
-#ax.set_yscale('log')
 ax.set_title(r'SDO/AIA '+str(args.channel)+r' $\AA$, '+args.loop_location,fontsize=fs)
 for i in range(args.n_cuts):
     if i == 0:
