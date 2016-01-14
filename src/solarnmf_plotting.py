@@ -13,14 +13,15 @@ from scipy.ndimage.interpolation import rotate
 
 class MakeBSSPlots(object):
 
-    def __init__(self,toption,input_type,u,v,A,T,div,**kwargs):
+    def __init__(self,toption,input_type,u,v,A,T,**kwargs):
         self.toption = toption
         self.input_type = input_type
         self.u = u
         self.v = v
         self.A = A
         self.T = T
-        self.div = div
+        if 'div' in kwargs:
+            self.div = kwargs['div']
         if 'q' not in kwargs:
             self.q = self.u.shape[1]
         else:
@@ -223,15 +224,19 @@ class MakeBSSPlots(object):
 
     def plot_div(self,**kwargs):
         """Plot divergence metric as function of iteration"""
-        fig = plt.figure(figsize=self.fig_size)
-        ax = fig.gca()
-        ax.plot(self.div)
-        ax.set_yscale('log')
-        ax.set_xlim([0,len(self.div)])
-        ax.set_ylim([np.min(self.div),np.max(self.div)])
-        ax.set_title(r'Divergence Measure',fontsize=self.fs)
-        ax.set_xlabel(r'iteration',fontsize=self.fs)
-        ax.set_ylabel(r'$d(T,A)$',fontsize=self.fs)
+        try:
+            fig = plt.figure(figsize=self.fig_size)
+            ax = fig.gca()
+            ax.plot(self.div)
+            ax.set_yscale('log')
+            ax.set_xlim([0,len(self.div)])
+            ax.set_ylim([np.min(self.div),np.max(self.div)])
+            ax.set_title(r'Divergence Measure',fontsize=self.fs)
+            ax.set_xlabel(r'iteration',fontsize=self.fs)
+            ax.set_ylabel(r'$d(T,A)$',fontsize=self.fs)
+        except AttributeError:
+            self.logger.error("Cannot plot divergence metric. self.div not set.")
+            return
 
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.print_format,format=self.print_format,dpi=self.print_dpi)
