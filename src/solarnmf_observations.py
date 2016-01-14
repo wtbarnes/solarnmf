@@ -36,19 +36,19 @@ class MakeData(object):
         if self.toption == 'simulation':
             if 'nx' not in kwargs:
                 self.nx = 50
-                logging.warning("nx not specified. Setting nx to "%(self.nx))
+                logging.warning("nx not specified. Setting nx to %d"%(self.nx))
             else:
                 self.nx = kwargs['nx']
 
             if 'ny' not in kwargs:
                 self.ny = 50
-                logging.warning("ny not specified. Setting ny to "%(self.ny))
+                logging.warning("ny not specified. Setting ny to %d"%(self.ny))
             else:
                 self.ny = kwargs['ny']
 
             if 'p' not in kwargs:
                 self.p = 5
-                logging.warning("p not specified. Setting p to "%(self.p))
+                logging.warning("p not specified. Setting p to %d"%(self.p))
             else:
                 self.p = kwargs['p']
 
