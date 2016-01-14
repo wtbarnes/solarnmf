@@ -23,12 +23,15 @@ class MakeData(object):
         self.ngrid_y = 10
         self.ngrid_x = 10
         self.noise_level = 0.05
+        
+        #Configure logger
+        self.logger = logging.getLogger(type(self).__name__)
 
         #Check timeseries options
         if self.input_type == 'timeseries':
             if 'angle' not in kwargs:
                 self.angle = 0
-                logging.warning("Angle not specified. Setting angle to %f"%(self.angle))
+                self.logger.warning("Angle not specified. Setting angle to %f"%(self.angle))
             else:
                 self.angle = kwargs['angle']
 
@@ -36,19 +39,19 @@ class MakeData(object):
         if self.toption == 'simulation':
             if 'nx' not in kwargs:
                 self.nx = 50
-                logging.warning("nx not specified. Setting nx to %d"%(self.nx))
+                self.logger.warning("nx not specified. Setting nx to %d"%(self.nx))
             else:
                 self.nx = kwargs['nx']
 
             if 'ny' not in kwargs:
                 self.ny = 50
-                logging.warning("ny not specified. Setting ny to %d"%(self.ny))
+                self.logger.warning("ny not specified. Setting ny to %d"%(self.ny))
             else:
                 self.ny = kwargs['ny']
 
             if 'p' not in kwargs:
                 self.p = 5
-                logging.warning("p not specified. Setting p to %d"%(self.p))
+                self.logger.warning("p not specified. Setting p to %d"%(self.p))
             else:
                 self.p = kwargs['p']
 

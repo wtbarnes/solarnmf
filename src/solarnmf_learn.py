@@ -35,15 +35,18 @@ class SeparateSources(object):
         self.beta = 1.0 - self.alpha
         self.l_toeplitz = params['l_toeplitz']
             
+        #Configure logger
+        self.logger = logging.getLogger(type(self).__name__)
+            
         if 'print_results' in kwargs:
             self.print_results = kwargs['print_results']
         else:
             self.print_results = False
         
         #Log setup options
-        logging.info("Using "+self.div_measure+" divergence measure.")
-        logging.info("Using "+self.update_rules+" update rules.")
-        logging.info("Guessed number of sources "+str(self.q))
+        self.logger.info("Using "+self.div_measure+" divergence measure.")
+        self.logger.info("Using "+self.update_rules+" update rules.")
+        self.logger.info("Guessed number of sources "+str(self.q))
 
 
     def initialize_uva(self):
@@ -59,7 +62,7 @@ class SeparateSources(object):
 
         for i in range(self.r):
             
-            logging.info("Initialization iteration "+str(i))
+            self.logger.info("Initialization iteration "+str(i))
 
             u_temp,v_temp,a_temp,div_temp = self.minimize_div(u_temp,v_temp,self.r_iter)
 
@@ -94,7 +97,7 @@ class SeparateSources(object):
             div[i] = self.calculate_div(u,v,A,i)
             
             if i%10 == 0:
-                logging.info("At iteration "+str(i)+" with divergence "+str(div[i]))
+                self.logger.info("At iteration "+str(i)+" with divergence "+str(div[i]))
                 if (self.print_results is not False) and (max_iter > self.r_iter):
                     self.file_io(u,v,A,div)
 
