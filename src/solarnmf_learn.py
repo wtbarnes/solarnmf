@@ -34,32 +34,16 @@ class SeparateSources(object):
         self.alpha = params['alpha']
         self.beta = 1.0 - self.alpha
         self.l_toeplitz = params['l_toeplitz']
-        
-        if 'verbose' in kwargs:
-            self.verbose = kwargs['verbose']
-        else:
-            self.verbose = False
-            
-        if 'logger' in kwargs:
-            self.logger = kwargs['logger']
-        else:
-            self.logger = False
             
         if 'print_results' in kwargs:
             self.print_results = kwargs['print_results']
         else:
             self.print_results = False
         
-            
-        if self.verbose:
-            if self.logger is False:
-                print "Using ",self.div_measure," divergence measure."
-                print "Using ",self.update_rules," update rules."
-                print "Guessed number of sources ",self.q
-            else:
-                logging.info("Using "+self.div_measure+" divergence measure.")
-                logging.info("Using "+self.update_rules+" update rules.")
-                logging.info("Guessed number of sources "+str(self.q))
+        #Log setup options
+        logging.info("Using "+self.div_measure+" divergence measure.")
+        logging.info("Using "+self.update_rules+" update rules.")
+        logging.info("Guessed number of sources "+str(self.q))
 
 
     def initialize_uva(self):
@@ -75,11 +59,7 @@ class SeparateSources(object):
 
         for i in range(self.r):
             
-            if self.verbose:
-                if self.logger is False:
-                    print "Initialization iteration ",i
-                else:
-                    logging.info("Initialization iteration "+str(i))
+            logging.info("Initialization iteration "+str(i))
 
             u_temp,v_temp,a_temp,div_temp = self.minimize_div(u_temp,v_temp,self.r_iter)
 
@@ -114,11 +94,7 @@ class SeparateSources(object):
             div[i] = self.calculate_div(u,v,A,i)
             
             if i%10 == 0:
-                if self.verbose:
-                    if self.logger is False:
-                        print "At iteration ",i," with divergence ",div[i]
-                    else:
-                        logging.info("At iteration "+str(i)+" with divergence "+str(div[i]))
+                logging.info("At iteration "+str(i)+" with divergence "+str(div[i]))
                 if (self.print_results is not False) and (max_iter > self.r_iter):
                     self.file_io(u,v,A,div)
 

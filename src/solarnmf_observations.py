@@ -4,6 +4,7 @@
 #2 April 2015
 
 #Import needed modules
+import logging
 import numpy as np
 from scipy.ndimage.interpolation import rotate
 
@@ -27,7 +28,7 @@ class MakeData(object):
         if self.input_type == 'timeseries':
             if 'angle' not in kwargs:
                 self.angle = 0
-                print "angle not specified. Setting angle to ",self.angle
+                logging.warning("Angle not specified. Setting angle to %f"%(self.angle))
             else:
                 self.angle = kwargs['angle']
 
@@ -35,19 +36,19 @@ class MakeData(object):
         if self.toption == 'simulation':
             if 'nx' not in kwargs:
                 self.nx = 50
-                print "nx not specified. Setting nx to ",self.nx
+                logging.warning("nx not specified. Setting nx to "%(self.nx))
             else:
                 self.nx = kwargs['nx']
 
             if 'ny' not in kwargs:
                 self.ny = 50
-                print "ny not specified. Setting ny to ",self.ny
+                logging.warning("ny not specified. Setting ny to "%(self.ny))
             else:
                 self.ny = kwargs['ny']
 
             if 'p' not in kwargs:
                 self.p = 5
-                print "p not specified. Setting p to ",self.p
+                logging.warning("p not specified. Setting p to "%(self.p))
             else:
                 self.p = kwargs['p']
 
