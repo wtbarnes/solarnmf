@@ -144,8 +144,8 @@ class MakeBSSPlots(object):
                     tmp_mask = np.ma.masked_where(self.target[pairs[i][0]]<self.zero_tol*np.max(self.target[pairs[i][0]]),self.target[pairs[i][0]])
                     im = ax[0,i].imshow(tmp_mask,cmap=self.cm)
                 except IndexError:
-                    
-                    
+                    self.logger.debug("Skipping source entry %d, out of range."%i)
+                      
                 try:
                     tmp_mask = np.ma.masked_where(self.target[pairs[i][1]]<self.zero_tol*np.max(self.target[pairs[i][1]]),self.target[pairs[i][1]])
                     im = ax[1,i].imshow(tmp_mask,cmap=self.cm)
