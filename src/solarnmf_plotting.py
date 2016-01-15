@@ -108,10 +108,11 @@ class MakeBSSPlots(object):
             ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
             ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
             ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
-            ax.set_title('Composite Comparison',fontsize=self.fs)
+            ax.set_ylim([0,1])
+            ax.set_xlim([0,len(self.T)])
             ax.set_yticks([np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)])
             ax.yaxis.set_major_formatter(self.yaxis_format)
-            ax.legend(loc=1)
+            ax.legend(loc='best')
 
         else:
             raise ValueError("Invalid input type option.")
@@ -143,12 +144,20 @@ class MakeBSSPlots(object):
                 try:
                     tmp_mask = np.ma.masked_where(self.target[pairs[i][0]]<self.zero_tol*np.max(self.target[pairs[i][0]]),self.target[pairs[i][0]])
                     im = ax[0,i].imshow(tmp_mask,cmap=self.cm)
+                    ax[0,i].set_xlim([0,np.shape(self.target[pairs[i][0]])[1]])
+                    ax[0,i].set_ylim([0,np.shape(self.target[pairs[i][0]])[0]])
+                    ax[0,i].set_xticks([0,int(np.shape(self.target[pairs[i][0]])[1]/2),np.shape(self.target[pairs[i][0]])[1]])
+                    ax[0,i].set_yticks([0,int(np.shape(self.target[pairs[i][0]])[0]/2),np.shape(self.target[pairs[i][0]])[0]])
                 except IndexError:
                     self.logger.debug("Skipping source entry %d, out of range."%i)
                       
                 try:
                     tmp_mask = np.ma.masked_where(self.target[pairs[i][1]]<self.zero_tol*np.max(self.target[pairs[i][1]]),self.target[pairs[i][1]])
                     im = ax[1,i].imshow(tmp_mask,cmap=self.cm)
+                    ax[1,i].set_xlim([0,np.shape(self.target[pairs[i][1]])[1]])
+                    ax[1,i].set_ylim([0,np.shape(self.target[pairs[i][1]])[0]])
+                    ax[1,i].set_xticks([0,int(np.shape(self.target[pairs[i][1]])[1]/2),np.shape(self.target[pairs[i][1]])[1]])
+                    ax[1,i].set_yticks([0,int(np.shape(self.target[pairs[i][1]])[0]/2),np.shape(self.target[pairs[i][1]])[0]])
                 except IndexError:
                     self.logger.debug("Skipping source entry %d, out of range."%i)
                                 
@@ -218,7 +227,7 @@ class MakeBSSPlots(object):
             ax.set_xlabel(r'iteration',fontsize=self.fs)
             ax.set_ylabel(r'$d(T,A)$',fontsize=self.fs)
         except AttributeError:
-            self.logger.error("Cannot plot divergence metric. self.div not set.")
+            self.logger.exception("Cannot plot divergence metric. self.div not set.")
             return
 
         if 'print_fig_filename' in kwargs:
