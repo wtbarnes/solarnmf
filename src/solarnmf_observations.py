@@ -12,7 +12,7 @@ class MakeData(object):
     """Class for constructing data, either simulation or observational, for use in NMF or BSS methods
     """
 
-    def __init__(self,toption,input_type,nx=50,ny=50,p=5,angle=0.0,ngrid_y=10,ngrid_x=10**kwargs):
+    def __init__(self,toption,input_type,nx=50,ny=50,p=5,angle=0.0,ngrid_y=10,ngrid_x=10,**kwargs):
         """Constructor for MakeData class"""
 
         #Set observation matrix type
