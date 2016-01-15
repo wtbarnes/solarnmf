@@ -12,7 +12,7 @@ class MakeData(object):
     """Class for constructing data, either simulation or observational, for use in NMF or BSS methods
     """
 
-    def __init__(self,toption,input_type,**kwargs):
+    def __init__(self,toption,input_type,nx=50,ny=50,p=5,angle=0.0,ngrid_y=10,ngrid_x=10**kwargs):
         """Constructor for MakeData class"""
 
         #Set observation matrix type
@@ -20,8 +20,8 @@ class MakeData(object):
         self.input_type = input_type
 
         self.psi = 1.0e-16
-        self.ngrid_y = 10
-        self.ngrid_x = 10
+        self.ngrid_y = ngrid_y
+        self.ngrid_x = ngrid_x
         self.noise_level = 0.05
         
         #Configure logger
@@ -29,31 +29,17 @@ class MakeData(object):
 
         #Check timeseries options
         if self.input_type == 'timeseries':
-            if 'angle' not in kwargs:
-                self.angle = 0
-                self.logger.warning("Angle not specified. Setting angle to %f"%(self.angle))
-            else:
-                self.angle = kwargs['angle']
+            self.angle = angle
+            self.logger.info("Setting angle = %f"%(self.angle))
 
         #Check simulation and data options
         if self.toption == 'simulation':
-            if 'nx' not in kwargs:
-                self.nx = 50
-                self.logger.warning("nx not specified. Setting nx to %d"%(self.nx))
-            else:
-                self.nx = kwargs['nx']
-
-            if 'ny' not in kwargs:
-                self.ny = 50
-                self.logger.warning("ny not specified. Setting ny to %d"%(self.ny))
-            else:
-                self.ny = kwargs['ny']
-
-            if 'p' not in kwargs:
-                self.p = 5
-                self.logger.warning("p not specified. Setting p to %d"%(self.p))
-            else:
-                self.p = kwargs['p']
+            self.nx = nx
+            self.logger.info("Setting nx = %d"%(self.nx))
+            self.ny = ny
+            self.logger.info("Setting ny = %d"%(self.ny))
+            self.p = p
+            self.logger.info("Setting p = %d"%(self.p))
 
             self.grid_y = int(self.ny/self.ngrid_y)
             self.grid_x = int(self.nx/self.ngrid_x)
