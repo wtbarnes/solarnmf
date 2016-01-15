@@ -274,8 +274,10 @@ class MakeBSSPlots(object):
         
     def source_id(self):
         """Find sources in image by picking out peak coordinates in target image"""
-        self.peak_id = []
+        tmp = []
         for c in self.components:
-            self.peak_id.append(np.unravel_index(np.argmax(c),np.shape(c)))
+            centers = np.unravel_index(np.argmax(c),np.shape(c))
+            self.logger.debug("(%d,%d)"%centers)
+            tmp.append(centers)
             
-        self.peak_id = np.array(self.peak_id)
+        self.peak_id = np.array(tmp)
