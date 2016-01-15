@@ -99,6 +99,12 @@ class MakeBSSPlots(object):
             ax[1].set_xticks([])
             cbar1 = fig.colorbar(imT,cax=make_axes_locatable(ax[0]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)],format=self.yaxis_format)
             cbar2 = fig.colorbar(imA,cax=make_axes_locatable(ax[1]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.A),(np.max(self.A)-np.min(self.A))/2.0,np.max(self.A)],format=self.yaxis_format)
+            if 'peak_id' in kwargs and kwargs['peak_id']:
+                if not hasattr(self,'peak_id'):
+                    self.logger.info("Finding peaks from separated images")
+                    self.source_id()
+                
+                ax[0].scatter(x=self.peak_id[:,1],y=self.peak_id[:,0],c='white',marker='x',s=15)
 
         elif self.input_type == 'timeseries':
             fig = plt.figure(figsize=self.fig_size)
@@ -260,5 +266,11 @@ class MakeBSSPlots(object):
             i_target += 1
             
         return pairs
-                
-                
+        
+    def source_id(self):
+        """Find sources in image by picking out peak coordinates in target image"""
+        self.peak_id = []
+        for c in self.components:
+            self.peak_id.append(np.unravel_index(np.argmax(c),np.shape(c)))
+            
+        self.peak_id = np.array(self.peak_id)
