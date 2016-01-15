@@ -162,7 +162,7 @@ class MakeBSSPlots(object):
                     self.logger.debug("Skipping source entry %d, out of range."%i)
                       
                 try:
-                    tmp_mask = np.ma.masked_where(self.target[pairs[i][1]]<self.zero_tol*np.max(self.target[pairs[i][1]]),self.target[pairs[i][1]])
+                    tmp_mask = np.ma.masked_where(self.components[pairs[i][1]]<self.zero_tol*np.max(self.components[pairs[i][1]]),self.components[pairs[i][1]])
                     im = ax[1,i].imshow(tmp_mask,cmap=self.cm)
                     ax[1,i].set_xlim([0,np.shape(self.target[pairs[i][1]])[1]])
                     ax[1,i].set_ylim([0,np.shape(self.target[pairs[i][1]])[0]])
