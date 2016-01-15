@@ -3,6 +3,7 @@
 #Will Barnes
 #3 April 2015
 
+import logging
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -13,45 +14,42 @@ from scipy.ndimage.interpolation import rotate
 
 class MakeBSSPlots(object):
 
-    def __init__(self,toption,input_type,u,v,A,T,**kwargs):
+    def __init__(self,toption,input_type,u,v,A,T,div=None,q=None,angle=0.0,fig_size=(8,8),print_format='eps',print_dpi=1000,**kwargs):
         self.toption = toption
         self.input_type = input_type
         self.u = u
         self.v = v
         self.A = A
         self.T = T
-        if 'div' in kwargs:
-            self.div = kwargs['div']
-        if 'q' not in kwargs:
+
+        if div:
+            self.div
+        if not q:
             self.q = self.u.shape[1]
         else:
-            self.q = kwargs['q']
+            self.q = q
         
+        self.ny,self.nx = np.shape(T)
+            
+        #set optional member variables
+        self.angle = angle
+        self.print_format = print_format
+        self.print_dpi = print_dpi
         self.fs = 18
         self.cm = 'Blues'
         self.zero_tol = 1.e-5
-        if 'print_format' not in kwargs:
-            self.print_format = 'eps'
-        else:
-            self.print_format = kwargs['print_format']
-        if 'dpi' not in kwargs:
-            self.print_dpi = 1000
-        else:
-            self.print_dpi = kwargs['dpi']
         self.fig_size = (8,8)
         self.yaxis_format = FormatStrFormatter('%3.1f')
         
-        self.ny = kwargs['ny']
-        self.nx = kwargs['nx']
-        if 'angle' not in kwargs:
-            self.angle = 0.0
-        else:
-            self.angle = kwargs['angle']
-        
+        #Preprocessing
         self.A = self.rotate_back(A)
         self.get_components()
         self.ts_cut = np.unravel_index(self.A.argmax(),self.A.shape)[0]
         
+        #Configure logger
+        self.logger = logging.getLogger(type(self).__name__)
+        
+        #Check data type
         if self.toption == 'simulation':
             try:
                 self.target = kwargs['target']
@@ -90,7 +88,7 @@ class MakeBSSPlots(object):
         """Plot original observation and recovered result"""
         if self.input_type == 'matrix':
             fig,ax = plt.subplots(1,2,figsize=self.fig_size)
-            plt.subplots_adjust(left=0.05,right=0.95,top=1.0,bottom=0.0,hspace=0.0,wspace=0.12)
+            plt.tight_layout()
             imT = ax[0].imshow(np.ma.masked_where(self.T<self.zero_tol*np.max(self.T),self.T),cmap=self.cm)
             imA = ax[1].imshow(np.ma.masked_where(self.A<self.zero_tol*np.max(self.A),self.A),cmap=self.cm)
             ax[0].set_title(r'$T$, Observation',fontsize=self.fs)
@@ -105,7 +103,7 @@ class MakeBSSPlots(object):
         elif self.input_type == 'timeseries':
             fig = plt.figure(figsize=self.fig_size)
             ax = fig.gca()
-            plt.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.07,hspace=0.05)
+            plt.tight_layout()
             ax.plot(self.T,'.k',label='Observation')
             ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
             ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
@@ -137,52 +135,43 @@ class MakeBSSPlots(object):
             
             
         if self.input_type == 'matrix':
-            fig,ax = plt.subplots(2,rows,figsize=self.fig_size)
-            plt.subplots_adjust(left=0.05,right=0.98,top=1.0,bottom=0.0,hspace=0.0,wspace=0.1)
+            fig,ax = plt.subplots(2,rows,figsize=self.fig_size,sharex=True,sharey=True)
+            plt.tight_layout()
             ax[0,0].set_ylabel(r'Sources',fontsize=self.fs)
             ax[1,0].set_ylabel(r'Predictions',fontsize=self.fs)
             for i in range(rows):
                 try:
                     tmp_mask = np.ma.masked_where(self.target[pairs[i][0]]<self.zero_tol*np.max(self.target[pairs[i][0]]),self.target[pairs[i][0]])
                     im = ax[0,i].imshow(tmp_mask,cmap=self.cm)
-                    ax[0,i].set_yticks([])
-                    ax[0,i].set_xticks([])
-                    #fig.colorbar(im,cax=make_axes_locatable(ax[0,i]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.target[i]),(np.max(self.target[i])-np.min(self.target[i]))/2.0,np.max(self.target[i])],format=self.yaxis_format)
-                except:
-                    pass
+                except IndexError:
+                    
+                    
                 try:
                     tmp_mask = np.ma.masked_where(self.target[pairs[i][1]]<self.zero_tol*np.max(self.target[pairs[i][1]]),self.target[pairs[i][1]])
                     im = ax[1,i].imshow(tmp_mask,cmap=self.cm)
-                    ax[1,i].set_yticks([])
-                    ax[1,i].set_xticks([])
-                    #fig.colorbar(im,cax=make_axes_locatable(ax[1,i]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.components[i]),(np.max(self.components[i])-np.min(self.components[i]))/2.0,np.max(self.components[i])],format=self.yaxis_format)
-                except:
-                    pass
+                except IndexError:
+                    self.logger.debug("Skipping source entry %d, out of range."%i)
                                 
         elif self.input_type == 'timeseries':
-            fig,ax = plt.subplots(rows,1,figsize=self.fig_size)
-            plt.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.07,hspace=0.05)
-            ax[0].set_title(r'Source Reconstruction',fontsize=self.fs)
+            fig,ax = plt.subplots(rows,1,figsize=self.fig_size,sharex=True,sharey=True)
+            plt.tight_layout()
             for i in range(rows):
-                if i == int(rows/2.0):
-                    ax[i].set_ylabel(r'$I$ (au)',fontsize=self.fs)
                 try:
                     ax[i].plot(self.target[pairs[i][0]],'.k',label='source')
-                except:
-                    pass
+                except IndexError:
+                    self.logger.debug("Skipping source entry %d, out of range."%i)
                 try:
                     ax[i].plot(self.components[pairs[i][1]][self.ts_cut,:],'r',label='prediction')
                     ax[i].set_yticks([0.0,(np.max(self.components[pairs[i][1]][self.ts_cut,:]) - np.min(self.components[pairs[i][1]][self.ts_cut,:]))/2.0,np.max(self.components[pairs[i][1]][self.ts_cut,:])])
                     ax[i].yaxis.set_major_formatter(self.yaxis_format)
                     ax[i].set_ylim([0,1])
-                except:
-                    pass
-                if i == rows-1:
-                    ax[i].set_xlabel(r'$t$ (au)',fontsize=self.fs)
-                else:
-                    ax[i].xaxis.set_ticklabels([])
+                except IndexError:
+                    self.logger.debug("Skipping source entry %d, out of range."%i)
 
-            ax[0].legend(loc=1)
+            fig.text(0.07, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
+                     va='center', rotation='vertical',fontsize=self.fs)
+            ax[-1].set_xlabel(r'$t$ $\mathrm{(au)}$',fontsize=self.fs)
+            ax[0].legend(loc='best')
 
         else:
             raise ValueError("Invalid input type option")
@@ -196,24 +185,18 @@ class MakeBSSPlots(object):
             
     def plot_obs_pred_total_sources_ts(self,**kwargs):
         """Plot sources + total for observation and prediction"""
-        if 'title' in kwargs:
-            plot_title = kwargs['title']
-        else:
-            plot_title = 'Composite Comparison'
         fig = plt.figure(figsize=self.fig_size)
         ax = fig.gca()
-        plt.subplots_adjust(left=0.1,right=0.95,top=0.95,bottom=0.07,hspace=0.05)
         ax.plot(self.T,'.k',label='Observation')
         ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
         for i in range(self.q):
             ax.plot(self.components[i][self.ts_cut,:],'--b')
         ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
         ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
-        ax.set_title(plot_title,fontsize=self.fs)
         ax.yaxis.set_major_formatter(self.yaxis_format)
         ax.set_ylim([0,1])
         ax.set_xlim([0,len(self.T)])
-        ax.legend(loc=2)
+        ax.legend(loc='best')
         
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.print_format,format=self.print_format,dpi=self.print_dpi)
