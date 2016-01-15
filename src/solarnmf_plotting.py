@@ -91,20 +91,25 @@ class MakeBSSPlots(object):
             plt.tight_layout()
             imT = ax[0].imshow(np.ma.masked_where(self.T<self.zero_tol*np.max(self.T),self.T),cmap=self.cm)
             imA = ax[1].imshow(np.ma.masked_where(self.A<self.zero_tol*np.max(self.A),self.A),cmap=self.cm)
-            ax[0].set_title(r'$T$, Observation',fontsize=self.fs)
-            ax[1].set_title(r'$A$, Prediction',fontsize=self.fs)
-            ax[0].set_yticks([])
-            ax[0].set_xticks([])
-            ax[1].set_yticks([])
-            ax[1].set_xticks([])
+            
             cbar1 = fig.colorbar(imT,cax=make_axes_locatable(ax[0]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.T),(np.max(self.T)-np.min(self.T))/2.0,np.max(self.T)],format=self.yaxis_format)
             cbar2 = fig.colorbar(imA,cax=make_axes_locatable(ax[1]).append_axes("right","5%",pad="3%"),ticks=[np.min(self.A),(np.max(self.A)-np.min(self.A))/2.0,np.max(self.A)],format=self.yaxis_format)
             if 'peak_id' in kwargs and kwargs['peak_id']:
                 if not hasattr(self,'peak_id'):
                     self.logger.info("Finding peaks from separated images")
                     self.source_id()
-                
                 ax[0].scatter(x=self.peak_id[:,1],y=self.peak_id[:,0],c='white',marker='x',s=15)
+                
+            ax[0].set_title(r'$T$, Observation',fontsize=self.fs)
+            ax[1].set_title(r'$A$, Prediction',fontsize=self.fs)
+            ax[0].set_xlim([0,np.shape(self.T)[1]])
+            ax[0].set_ylim([0,np.shape(self.T)[0]])
+            ax[1].set_xlim([0,np.shape(self.A)[1]])
+            ax[1].set_ylim([0,np.shape(self.A)[0]])
+            ax[0].set_yticks([])
+            ax[0].set_xticks([])
+            ax[1].set_yticks([])
+            ax[1].set_xticks([])
 
         elif self.input_type == 'timeseries':
             fig = plt.figure(figsize=self.fig_size)
