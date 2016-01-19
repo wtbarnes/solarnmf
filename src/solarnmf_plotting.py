@@ -249,7 +249,8 @@ class MakeBSSPlots(object):
             
     def match_closest(self):
         """Create list of pairs of components and targets so that the plots correspond"""
-        sources = range(self.q)
+        sources = []
+        [sources.append(k) for k in range(self.q)]
         pairs = []
         i_target = 0
         while sources != []:
