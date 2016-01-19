@@ -165,8 +165,8 @@ class MakeBSSPlots(object):
                     ax[0,i].set_ylim([0,np.shape(self.target[pairs[i][0]])[0]])
                     ax[0,i].set_xticks([0,int(np.shape(self.target[pairs[i][0]])[1]/2),np.shape(self.target[pairs[i][0]])[1]])
                     ax[0,i].set_yticks([0,int(np.shape(self.target[pairs[i][0]])[0]/2),np.shape(self.target[pairs[i][0]])[0]])
-                except IndexError:
-                    self.logger.debug("Skipping source entry %d, out of range."%i)
+                except:
+                    self.logger.exception("Skipping source entry %d, out of range."%i)
                       
                 try:
                     tmp_mask = np.ma.masked_where(self.components[pairs[i][1]]<self.zero_tol*np.max(self.components[pairs[i][1]]),self.components[pairs[i][1]])
@@ -175,8 +175,8 @@ class MakeBSSPlots(object):
                     ax[1,i].set_ylim([0,np.shape(self.target[pairs[i][1]])[0]])
                     ax[1,i].set_xticks([0,int(np.shape(self.target[pairs[i][1]])[1]/2),np.shape(self.target[pairs[i][1]])[1]])
                     ax[1,i].set_yticks([0,int(np.shape(self.target[pairs[i][1]])[0]/2),np.shape(self.target[pairs[i][1]])[0]])
-                except IndexError:
-                    self.logger.debug("Skipping source entry %d, out of range."%i)
+                except:
+                    self.logger.exception("Skipping source entry %d, out of range."%i)
                                 
         elif self.input_type == 'timeseries':
             fig,ax = plt.subplots(rows,1,figsize=self.fig_size,sharex=True,sharey=True)
@@ -184,15 +184,15 @@ class MakeBSSPlots(object):
             for i in range(rows):
                 try:
                     ax[i].plot(self.target[pairs[i][0]],'.k',label='source')
-                except IndexError:
-                    self.logger.debug("Skipping source entry %d, out of range."%i)
+                except:
+                    self.logger.exception("Skipping source entry %d, out of range."%i)
                 try:
                     ax[i].plot(self.components[pairs[i][1]][self.timeseries_cut(self.components[pairs[i][1]]),:],'r',label='prediction')
                     #ax[i].set_yticks([0.0,(np.max(self.components[pairs[i][1]][self.ts_cut,:]) - np.min(self.components[pairs[i][1]][self.ts_cut,:]))/2.0,np.max(self.components[pairs[i][1]][self.ts_cut,:])])
                     ax[i].yaxis.set_major_formatter(self.yaxis_format)
                     ax[i].set_ylim([0,1])
-                except IndexError:
-                    self.logger.debug("Skipping source entry %d, out of range."%i)
+                except:
+                    self.logger.exception("Skipping source entry %d, out of range."%i)
 
             fig.text(0.1, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
                      va='center', rotation='vertical',fontsize=self.fs)
