@@ -29,7 +29,10 @@ class MakeBSSPlots(object):
         else:
             self.q = q
         
-        self.ny,self.nx = np.shape(T)
+        if self.input_type == 'matrix':
+            self.ny,self.nx = np.shape(T)
+        else:
+            self.ny,self.nx = np.shape(T)[0],np.shape(T)[0]
             
         #set optional member variables
         self.angle = angle
@@ -38,7 +41,7 @@ class MakeBSSPlots(object):
         self.fs = 18
         self.cm = 'Blues'
         self.zero_tol = 1.e-5
-        self.fig_size = (8,8)
+        self.fig_size = fig_size
         self.yaxis_format = FormatStrFormatter('%3.1f')
         
         #Preprocessing
