@@ -21,6 +21,9 @@ class MakeBSSPlots(object):
         self.v = v
         self.A = A
         self.T = T
+        
+        #Configure logger
+        self.logger = logging.getLogger(type(self).__name__)
 
         if div:
             self.div
@@ -47,9 +50,6 @@ class MakeBSSPlots(object):
         #Preprocessing
         self.A = self.rotate_back(A)
         self.get_components()
-        
-        #Configure logger
-        self.logger = logging.getLogger(type(self).__name__)
         
         #Check data type
         if self.toption == 'simulation':
