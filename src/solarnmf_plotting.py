@@ -140,6 +140,7 @@ class MakeBSSPlots(object):
             rows = max(self.q,len(self.target))
             pairs = self.match_closest()
         except:
+            self.logger.exception("Cannot match pairs.")
             rows = self.q
             pairs = []
             [pairs.append((i,i)) for i in range(self.q)]
@@ -252,7 +253,7 @@ class MakeBSSPlots(object):
         pairs = []
         i_target = 0
         while sources != []:
-            min_diff = 1.0e+50
+            min_diff = 1.0e+300
             pairs.append(([],[]))
             
             for i in sources:
