@@ -68,6 +68,7 @@ class MakeData(object):
 
             else:
                 Tmat = self.ts_to_mat(T)
+                Tmat[np.where(Tmat<self.psi)] = self.psi
                 return target,T,Tmat
 
         else:
