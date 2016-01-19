@@ -47,7 +47,6 @@ class MakeBSSPlots(object):
         #Preprocessing
         self.A = self.rotate_back(A)
         self.get_components()
-        self.ts_cut = np.unravel_index(self.A.argmax(),self.A.shape)[0]
         
         #Configure logger
         self.logger = logging.getLogger(type(self).__name__)
@@ -64,6 +63,7 @@ class MakeBSSPlots(object):
             except:
                 raise ValueError("Please specify matrix representation of time series when using 1D representation.")
                 
+                
     def rotate_back(self,mat):
         """Rotate back and reshape"""
         #rotate matrix back
@@ -77,7 +77,10 @@ class MakeBSSPlots(object):
         delta_y = int(np.round((ny_r - self.ny)/2.0)) 
         delta_x = int(np.round((nx_r - self.nx)/2.0))
         #Return cut and rotated matrix
-        return mat_rot[delta_y:((ny_r - delta_y)),delta_x:((nx_r - delta_x))]
+        res = mat_rot[delta_y:((ny_r - delta_y)),delta_x:((nx_r - delta_x))]
+        if not np.shape(res) == (self.ny,self.nx):
+            self.logger.warning("Rotated dimensions do not match original dimensions.")
+        return res
     
     
     def get_components(self):
@@ -118,7 +121,7 @@ class MakeBSSPlots(object):
             ax = fig.gca()
             plt.tight_layout()
             ax.plot(self.T,'.k',label='Observation')
-            ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
+            ax.plot(self.A[self.timeseries_cut(self.A),:],'r',label='Prediction')
             ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
             ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
             ax.set_ylim([0,1])
@@ -184,14 +187,14 @@ class MakeBSSPlots(object):
                 except IndexError:
                     self.logger.debug("Skipping source entry %d, out of range."%i)
                 try:
-                    ax[i].plot(self.components[pairs[i][1]][self.ts_cut,:],'r',label='prediction')
-                    ax[i].set_yticks([0.0,(np.max(self.components[pairs[i][1]][self.ts_cut,:]) - np.min(self.components[pairs[i][1]][self.ts_cut,:]))/2.0,np.max(self.components[pairs[i][1]][self.ts_cut,:])])
+                    ax[i].plot(self.components[pairs[i][1]][self.timeseries_cut(self.components[pairs[i][1]]),:],'r',label='prediction')
+                    #ax[i].set_yticks([0.0,(np.max(self.components[pairs[i][1]][self.ts_cut,:]) - np.min(self.components[pairs[i][1]][self.ts_cut,:]))/2.0,np.max(self.components[pairs[i][1]][self.ts_cut,:])])
                     ax[i].yaxis.set_major_formatter(self.yaxis_format)
                     ax[i].set_ylim([0,1])
                 except IndexError:
                     self.logger.debug("Skipping source entry %d, out of range."%i)
 
-            fig.text(0.07, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
+            fig.text(0.1, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
                      va='center', rotation='vertical',fontsize=self.fs)
             ax[-1].set_xlabel(r'$t$ $\mathrm{(au)}$',fontsize=self.fs)
             ax[0].legend(loc='best')
@@ -211,9 +214,9 @@ class MakeBSSPlots(object):
         fig = plt.figure(figsize=self.fig_size)
         ax = fig.gca()
         ax.plot(self.T,'.k',label='Observation')
-        ax.plot(self.A[self.ts_cut,:],'r',label='Prediction')
+        ax.plot(self.A[self.timeseries_cut(self.A),:],'r',label='Prediction')
         for i in range(self.q):
-            ax.plot(self.components[i][self.ts_cut,:],'--b')
+            ax.plot(self.components[i][self.timeseries_cut(self.components[i]),:],'--b')
         ax.set_xlabel(r'$t$ (au)',fontsize=self.fs)
         ax.set_ylabel(r'$I$ (au)',fontsize=self.fs)
         ax.yaxis.set_major_formatter(self.yaxis_format)
@@ -264,7 +267,7 @@ class MakeBSSPlots(object):
                 if self.input_type == 'matrix':
                     diff = np.mean(np.fabs(self.target[i_target] - self.components[i]))
                 else:
-                    diff = np.mean(np.fabs(self.target[i_target] - self.components[i][self.ts_cut,:]))
+                    diff = np.mean(np.fabs(self.target[i_target] - self.components[i][self.timeseries_cut(self.components[i]),:]))
                 
                 if diff < min_diff:
                     pairs.pop()
@@ -285,3 +288,8 @@ class MakeBSSPlots(object):
             tmp.append(centers)
             
         self.peak_id = np.array(tmp)
+        
+    
+    def timeseries_cut(self,mat):
+        """Get row index for which matrix is maximum."""
+        return np.unravel_index(mat.argmax(),mat.shape)[0]
