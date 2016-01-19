@@ -87,7 +87,7 @@ class MakeBSSPlots(object):
         """Separate A matrix into components"""
         self.components = []
         for i in range(self.q):
-            self.components.append(self.rotate_back(np.dot(self.u[:,i],self.v[i,:])))
+            self.components.append(self.rotate_back(np.outer(self.u[:,i],self.v[i,:])))
         
     
     def plot_obs_pred_total(self,**kwargs):
