@@ -79,7 +79,7 @@ class MakeBSSPlots(object):
         #Return cut and rotated matrix
         res = mat_rot[delta_y:((ny_r - delta_y)),delta_x:((nx_r - delta_x))]
         if not np.shape(res) == (self.ny,self.nx):
-            self.logger.warning("Rotated dimensions do not match original dimensions.")
+            self.logger.warning("Rotated dimensions do not match original dimensions; (%d,%d) != (ny=%d,nx=%d)"%(np.shape(res)[0],np.shape(res)[1],self.ny,self.nx))
         return res
     
     
