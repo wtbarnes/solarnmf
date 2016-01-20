@@ -80,6 +80,27 @@ class MakeBSSPlots(object):
         res = mat_rot[delta_y:((ny_r - delta_y)),delta_x:((nx_r - delta_x))]
         if not np.shape(res) == (self.ny,self.nx):
             self.logger.warning("Rotated dimensions do not match original dimensions; (%d,%d) != (ny=%d,nx=%d)"%(np.shape(res)[0],np.shape(res)[1],self.ny,self.nx))
+            self.logger.warnging("Adjusting dimensions for compatibility.")
+            diff_row = self.ny - np.shape(res)[0]
+            diff_col = self.nx - np.shape(res)[1]
+            #adjust row dim
+            if diff_row < 0:
+                #remove last row
+                res = res[:self.ny,:]
+            elif diff_row > 0:
+                #add last row below zero tol
+                res = np.vstack([res,0.9*self.zero_tol*np.ones(np.shape(res)[1])])
+            else:
+                self.logger.warning("No adjustment on rows, %d==%d"%(np.shape(res)[0],self.ny))
+            #adjust col dim
+            if diff_col < 0:
+                #remove last col
+                res = res[:,:self.nx]
+            elif diff_col > 0:
+                res = np.hstack([res,0.9*self.zero_tol*np.ones([np.shape(res)[0],1])])
+            else:
+                self.logger.warning("No adjustment on columns, %d==%d"%(np.shape(res)[1],self.nx))
+                
         return res
     
     
