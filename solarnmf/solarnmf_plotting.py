@@ -12,7 +12,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from scipy.ndimage.interpolation import rotate
 
-class MakeBSSPlots(object):
+class Plotter(object):
 
     def __init__(self,toption,input_type,u,v,A,T,div=None,q=None,angle=0.0,fig_size=(8,8),print_format='eps',print_dpi=1000,**kwargs):
         self.toption = toption

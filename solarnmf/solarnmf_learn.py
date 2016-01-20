@@ -9,7 +9,7 @@ import pickle
 import logging
 from scipy.linalg import toeplitz
 
-class SeparateSources(object):
+class Learner(object):
     """Class that performs BSS using specified method for given observation matrix"""
 
     def __init__(self,T,q,params,**kwargs):

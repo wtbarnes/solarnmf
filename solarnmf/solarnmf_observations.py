@@ -8,7 +8,7 @@ import logging
 import numpy as np
 from scipy.ndimage.interpolation import rotate
 
-class MakeData(object):
+class DataMaker(object):
     """Class for constructing data, either simulation or observational, for use in NMF or BSS methods
     """
 
