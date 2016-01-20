@@ -194,7 +194,7 @@ class MakeBSSPlots(object):
                 except:
                     self.logger.exception("Skipping source entry %d, out of range."%i)
 
-            fig.text(0.1, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
+            fig.text(0.03, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
                      va='center', rotation='vertical',fontsize=self.fs)
             ax[-1].set_xlabel(r'$t$ $\mathrm{(au)}$',fontsize=self.fs)
             ax[0].legend(loc='best')
