@@ -25,8 +25,8 @@ class MakeBSSPlots(object):
         #Configure logger
         self.logger = logging.getLogger(type(self).__name__)
 
-        if div:
-            self.div
+        if div is not None:
+            self.div = div
         if not q:
             self.q = self.u.shape[1]
         else:
@@ -194,7 +194,7 @@ class MakeBSSPlots(object):
                 except:
                     self.logger.exception("Skipping source entry %d, out of range."%i)
 
-            fig.text(0.03, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
+            fig.text(0.005, 0.5, r'$I$ $\mathrm{(au)}$', ha='center',
                      va='center', rotation='vertical',fontsize=self.fs)
             ax[-1].set_xlabel(r'$t$ $\mathrm{(au)}$',fontsize=self.fs)
             ax[0].legend(loc='best')
