@@ -87,6 +87,7 @@ class DataMaker(object):
                 self.ny = T.shape[0]
                 self.sigma_y = float(int(self.ny/self.ngrid_y)/2.0)
                 Tmat = self.ts_to_mat(T)
+                Tmat[np.where(Tmat<self.psi)] = self.psi
                 return T,Tmat
 
             else:
